@@ -11,7 +11,7 @@
 
 ## Cấu trúc
 - `src/giaodien_UI`: giao diện và xử lý sự kiện Swing.
-- `src/dAO`: truy cập dữ liệu bằng JDBC (`PreparedStatement`, `ResultSet`).
+- `src/dao`: truy cập dữ liệu bằng JDBC (`PreparedStatement`, `ResultSet`).
 - `src/model`: các lớp dữ liệu như `BenhNhan`, `PhieuKham`, `HoaDon`.
 - `src/connectDB`: cấu hình và tạo kết nối JDBC.
 - `src/resources`: biểu tượng, hình ảnh và tài nguyên giao diện.
@@ -21,7 +21,7 @@
 - `docs`: tài liệu phân tích và thiết kế.
 
 ## Luồng phụ thuộc dự kiến
-`giaodien_UI` → `dAO` → JDBC → SQL Server. Các lớp trong `model` được GUI/DAO dùng để biểu diễn và truyền dữ liệu. `connectDB` cung cấp `Connection` cho DAO.
+`giaodien_UI` → `dao` → JDBC → SQL Server. Các lớp trong `model` được GUI/DAO dùng để biểu diễn và truyền dữ liệu. `connectDB` cung cấp `Connection` cho DAO.
 
 ## Mở bằng Eclipse
 Import thư mục này dưới dạng **Existing Projects into Workspace**. Thêm Microsoft SQL Server JDBC Driver vào Build Path (ví dụ `Library/mssql-jdbc.jar`).
