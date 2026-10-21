@@ -1,0 +1,7 @@
+/bin/
+/build/
+/out/
+*.class
+*.log
+.settings/
+.DS_Store
