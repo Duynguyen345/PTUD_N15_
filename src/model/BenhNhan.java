@@ -1,9 +1,11 @@
+
 package model;
 
 import java.time.LocalDate;
 
 public class BenhNhan {
 
+    // 1. Thuộc tính
     private String maBenhNhan;
     private String hoTen;
     private String soDienThoai;
@@ -12,27 +14,62 @@ public class BenhNhan {
     private String diaChi;
     private String tienSuDiUng;
 
-    // Constructor mặc định
+    // 2. Constructor mặc định
     public BenhNhan() {
     }
 
+    // 3. Constructor tạo bệnh nhân mới (chưa có mã)
+    public BenhNhan(String hoTen, String soDienThoai,
+                    String cccd, LocalDate ngaySinh,
+                    String diaChi, String tienSuDiUng) {
 
-    // Constructor đầy đủ, dùng khi đã có mã hoặc đọc từ CSDL
+        setHoTen(hoTen);
+        setSoDienThoai(soDienThoai);
+        setCccd(cccd);
+        setNgaySinh(ngaySinh);
+        setDiaChi(diaChi);
+        setTienSuDiUng(tienSuDiUng);
+    }
+
+    // 4. Constructor dùng khi đọc bệnh nhân từ CSDL
     public BenhNhan(String maBenhNhan, String hoTen,
                     String soDienThoai, String cccd,
                     LocalDate ngaySinh, String diaChi,
                     String tienSuDiUng) {
+
+        this(hoTen, soDienThoai, cccd,
+                ngaySinh, diaChi, tienSuDiUng);
+
+        if (maBenhNhan == null
+                || !maBenhNhan.matches("^BN[0-9]{6}(?!0000)[0-9]{4}$")) {
+            throw new IllegalArgumentException(
+                    "Mã bệnh nhân không hợp lệ."
+            );
+        }
+
         this.maBenhNhan = maBenhNhan;
-        this.hoTen = hoTen;
-        this.soDienThoai = soDienThoai;
-        this.cccd = cccd;
-        this.ngaySinh = ngaySinh;
-        this.diaChi = diaChi;
-        this.tienSuDiUng = tienSuDiUng;
     }
 
+    // 5. Copy constructor
+    public BenhNhan(BenhNhan original) {
 
-    // Getters và setters
+        if (original == null) {
+            throw new IllegalArgumentException(
+                    "Bệnh nhân nguồn không được null."
+            );
+        }
+
+        this.maBenhNhan = original.maBenhNhan;
+        setHoTen(original.hoTen);
+        setSoDienThoai(original.soDienThoai);
+        setCccd(original.cccd);
+        setNgaySinh(original.ngaySinh);
+        setDiaChi(original.diaChi);
+        setTienSuDiUng(original.tienSuDiUng);
+    }
+
+    // 6. Getter và Setter
+
     public String getMaBenhNhan() {
         return maBenhNhan;
     }
@@ -42,7 +79,14 @@ public class BenhNhan {
     }
 
     public void setHoTen(String hoTen) {
-        this.hoTen = hoTen;
+        if (hoTen == null || hoTen.trim().isEmpty()
+                || hoTen.codePoints().noneMatch(Character::isLetter)) {
+            throw new IllegalArgumentException(
+                    "Họ tên bệnh nhân không hợp lệ."
+            );
+        }
+
+        this.hoTen = hoTen.trim();
     }
 
     public String getSoDienThoai() {
@@ -50,6 +94,13 @@ public class BenhNhan {
     }
 
     public void setSoDienThoai(String soDienThoai) {
+        if (soDienThoai == null
+                || !soDienThoai.matches("^0[0-9]{9}$")) {
+            throw new IllegalArgumentException(
+                    "Số điện thoại bệnh nhân không hợp lệ."
+            );
+        }
+
         this.soDienThoai = soDienThoai;
     }
 
@@ -58,7 +109,20 @@ public class BenhNhan {
     }
 
     public void setCccd(String cccd) {
-        this.cccd = cccd;
+        if (cccd == null || cccd.trim().isEmpty()) {
+            this.cccd = null;
+            return;
+        }
+
+        String value = cccd.trim();
+
+        if (!value.matches("^[0-9]{12}$")) {
+            throw new IllegalArgumentException(
+                    "CCCD không hợp lệ."
+            );
+        }
+
+        this.cccd = value;
     }
 
     public LocalDate getNgaySinh() {
@@ -66,6 +130,12 @@ public class BenhNhan {
     }
 
     public void setNgaySinh(LocalDate ngaySinh) {
+        if (ngaySinh == null || ngaySinh.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "Ngày sinh bệnh nhân không hợp lệ."
+            );
+        }
+
         this.ngaySinh = ngaySinh;
     }
 
@@ -74,7 +144,13 @@ public class BenhNhan {
     }
 
     public void setDiaChi(String diaChi) {
-        this.diaChi = diaChi;
+        if (diaChi == null || diaChi.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Địa chỉ bệnh nhân không hợp lệ."
+            );
+        }
+
+        this.diaChi = diaChi.trim();
     }
 
     public String getTienSuDiUng() {
@@ -82,15 +158,18 @@ public class BenhNhan {
     }
 
     public void setTienSuDiUng(String tienSuDiUng) {
-        this.tienSuDiUng = tienSuDiUng;
+        this.tienSuDiUng = tienSuDiUng == null
+                ? null
+                : tienSuDiUng.trim();
     }
 
-    // Phương thức được mô tả trong báo cáo
+    // 7. Phương thức kiểm tra số điện thoại
     public boolean soDienThoaiHopLe() {
         return soDienThoai != null
                 && soDienThoai.matches("^0[0-9]{9}$");
     }
 
+    // 8. Biểu diễn thông tin đối tượng
     @Override
     public String toString() {
         return "BenhNhan [maBenhNhan=" + maBenhNhan
