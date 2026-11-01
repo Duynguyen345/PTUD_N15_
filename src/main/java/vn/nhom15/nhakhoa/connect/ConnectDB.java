@@ -9,9 +9,11 @@ import java.util.Properties;
 
 /** Noi DUY NHAT cap Connection cho toan bo ung dung. Doc cau hinh tu /db.properties. */
 public class ConnectDB {
-    private static Connection con;
-    private static final ConnectDB INSTANCE = new ConnectDB();
+    // CFG khai bao TRUOC INSTANCE: static khoi tao theo thu tu khai bao,
+    // constructor cua INSTANCE can CFG da san sang.
     private static final Properties CFG = new Properties();
+    private static final ConnectDB INSTANCE = new ConnectDB();
+    private static Connection con;
 
     private ConnectDB() {
         try (InputStream is = ConnectDB.class.getResourceAsStream("/db.properties")) {
