@@ -26,8 +26,8 @@ Tổng 21 + 4 phần tài liệu/demo của các chức năng = 25. Backlog có 
 | DAO | `dao/HoSoBenhAn_DAO.java`, `dao/ChiDinhDichVu_DAO.java`, `dao/Thuoc_DAO.java`, `dao/ChiTietCapThuoc_DAO.java` | |
 | BUS | `bus/KhamBenh_BUS.java`, `bus/HoSoBenhAn_BUS.java` | |
 | GUI | `gui/GD_KhamBenh_Controller.java` + `fxml/GD_KhamBenh.fxml` | một màn hình làm đủ BS-01→05 |
-| SQL | `DATA/schema/004_thuoc.sql`, `006_hosobenhan.sql`, `009_chidinhdichvu.sql`, `010_chitietcapthuoc.sql` + seed | |
-| Minh chứng | `docs/evidence/thang/` | |
+| SQL | `SourceCode/DATA/schema/004_thuoc.sql`, `006_hosobenhan.sql`, `009_chidinhdichvu.sql`, `010_chitietcapthuoc.sql` + seed | |
+| Minh chứng | `TaiLieu/docs/evidence/thang/` | |
 
 **File dùng chéo:** `PhieuKham_DAO` (Huy) — Thắng gọi `capNhatTrangThai`, `layDanhSachTheoBacSi`; nếu thiếu hàm → Issue cho Huy. `DichVu_BUS.danhSachDichVuDangPhucVu` (Duy) — nạp ComboBox chỉ định. `BoDem_DAO` (Thanh) — mã `HSyyMMddNNNN` khi tạo hồ sơ bệnh án. **Quyền chuyển `HOAN_TAT` thuộc duy nhất về `KhamBenh_BUS` của Thắng.**
 
@@ -83,7 +83,7 @@ Transaction (1 commit/rollback, đúng thứ tự):
 
 **BUS — `KhamBenh_BUS.hoanTat(session, maPhieuKham)`:** quyền BAC_SI + phiếu của mình; điều kiện hoàn tất (đúng đặc tả): `chanDoan` không rỗng (VL09) **và** nếu có chỉ định thì `ChiDinhDichVu` đã lưu ít nhất 1 dòng hợp lệ (TB06) → `UPDATE PhieuKham SET trangThai='HOAN_TAT' WHERE maPhieuKham=? AND trangThai='DANG_KHAM' AND maNhanVien=?` — 0 dòng → **TB10**. Không chuyển ngược; Thanh toán không đổi trạng thái này (hóa đơn cuối lượt là backlog LT-06).
 
-**Test case bắt buộc (ghi `docs/evidence/thang/test-cases.md`):**
+**Test case bắt buộc (ghi `TaiLieu/docs/evidence/thang/test-cases.md`):**
 
 | Mã | Tình huống | Kết quả mong đợi |
 | --- | --- | --- |

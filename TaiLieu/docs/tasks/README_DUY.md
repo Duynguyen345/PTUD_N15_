@@ -29,8 +29,8 @@ Tổng 25. Backlog có chủ nhiệm (chốt M0): **QT-07 hàng hóa/tồn kho**
 | DAO | `dao/TaiKhoan_DAO.java`, `dao/NhanVien_DAO.java`, `dao/DichVu_DAO.java`, `dao/BaoCao_DAO.java` | |
 | BUS | `bus/TaiKhoan_BUS.java`, `bus/NhanVien_BUS.java`, `bus/DichVu_BUS.java`, `bus/BaoCao_BUS.java` | `NhanVien_BUS`/`DichVu_BUS` là phụ thuộc của Huy/Thắng — chốt chữ ký sớm |
 | GUI | cặp FXML+Controller: `GD_DangNhap`, `GD_QLNhanVien`, `GD_QLDichVu`, `GD_BaoCao` | |
-| SQL | `DATA/schema/002_nhanvien_taikhoan.sql`, `003_dichvu.sql` + seed | |
-| Minh chứng | `docs/evidence/duy/` | |
+| SQL | `SourceCode/DATA/schema/002_nhanvien_taikhoan.sql`, `003_dichvu.sql` + seed | |
+| Minh chứng | `TaiLieu/docs/evidence/duy/` | |
 
 **Hợp đồng với Thanh (M0):** Duy chốt yêu cầu của `ConnectDB` (constructor đọc `db.properties`, `connect()`, `getConnection()` tự nối lại) — Thanh viết code; Duy review API. Cấm tạo lớp kết nối thứ hai.
 
@@ -38,7 +38,7 @@ Tổng 25. Backlog có chủ nhiệm (chốt M0): **QT-07 hàng hóa/tồn kho**
 
 ### 3.0. QT-01 — Khung ứng dụng (làm đầu tiên, M0)
 
-- `pom.xml`: `<maven.compiler.release>21</maven.compiler.release>`, dependency `org.openjfx:javafx-controls:21` + `javafx-fxml:21`, `com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11`, plugin `org.openjfx:javafx-maven-plugin` với `<mainClass>vn.nhom15.nhakhoa.App</mainClass>` → chạy được bằng `mvn javafx:run` trên mọi máy.
+- `pom.xml`: `<maven.compiler.release>21</maven.compiler.release>`, dependency `org.openjfx:javafx-controls:21` + `javafx-fxml:21`, `com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11`, plugin `org.openjfx:javafx-maven-plugin` với `<mainClass>main.App</mainClass>` → chạy được bằng `mvn javafx:run` trên mọi máy.
 - `App extends Application`: `App.setRoot(String fxmlTen)`, `App.openModal(String fxmlTen)` / `openModal(String, w, h)` (theo mẫu N11), `App.session` static; `start()` kiểm tra `ConnectDB.getInstance().connect()` trước khi mở `GD_DangNhap`.
 - `SessionContext`: `String maNhanVien`, `String hoTen`, `ChucVu chucVu` — tạo **chỉ** trong `TaiKhoan_BUS.dangNhap`, cấm dựng từ form.
 - `util/*` đúng theo RULES mục 4/7/9: `MaThongBao` chứa toàn bộ hằng TB/VL; `FormatUtil` (ngày `dd/MM/yyyy`, tiền `#,##0 ₫`); `ValidateUtil` (regex SĐT `^0\d{9}$`, CCCD 12 số, không rỗng, số dương); `QuyenUtil.kiemTraQuyen(session, ChucVu...)` ném TB08; `AlertUtil` (ERROR/INFO/CONFIRMATION khuôn chung).

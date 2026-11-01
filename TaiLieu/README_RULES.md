@@ -115,7 +115,7 @@ try {
 
 | Đối tượng | Quy tắc | Ví dụ đúng | Ví dụ sai |
 | --- | --- | --- | --- |
-| Package | lowercase, không dấu | `vn.nhom15.nhakhoa.dao` | `vn.nhom15.DAO` |
+| Package | lowercase, không dấu | `dao` | `vn.nhom15.DAO` |
 | Class/Entity/DAO/BUS | PascalCase, **tiếng Việt không dấu**; DAO đuôi `_DAO`, BUS đuôi `_BUS` | `BenhNhan`, `PhieuKham_DAO`, `HoaDon_BUS` | `benhnhan`, `Customer`, `PhieuKhamDAO` |
 | Hàm/biến | camelCase, không dấu | `lapPhieuKham`, `dsPhong`, `donGia` | `LapPhieuKham`, `don_gia` |
 | Hằng số | UPPER_SNAKE_CASE | `MAX_SO_THU_TU` | `maxSoThuTu` |
@@ -203,10 +203,10 @@ int n = pstm.executeUpdate();           // n == 0 → người khác đã đổi
 
 ---
 
-## 6. Quy tắc SQL Server & script trong `DATA/`
+## 6. Quy tắc SQL Server & script trong `SourceCode/DATA/`
 
-- `DATA/schema/`: `000_hatang.sql` (CREATE DATABASE `N15_PTUD_DB`, collation, bảng `BoDem`) → `001_phongkham.sql` (Thanh) → `002_nhanvien_taikhoan.sql` (Duy) → `003_dichvu.sql` (Duy) → `004_thuoc.sql` (Thắng) → `005_benhnhan.sql` (Huy) → `006_hosobenhan.sql` (Thắng) → `007_phieukham.sql` (Huy) → `008_hoadon_chitiethoadon.sql` (Huy) → `009_chidinhdichvu.sql` (Thắng) → `010_chitietcapthuoc.sql` (Thắng). `011_banggoiso.sql` (Thanh — chốt ở M0 nếu cần lưu "số đang gọi").
-- `DATA/seed/`: cùng số với schema (`002_seed_nhanvien_taikhoan.sql`…). Seed đủ FK, ≥10 bệnh nhân, ≥3 bác sĩ, ≥8 dịch vụ, dữ liệu trải 2 tuần để demo báo cáo.
+- `SourceCode/DATA/schema/`: `000_hatang.sql` (CREATE DATABASE `N15_PTUD_DB`, collation, bảng `BoDem`) → `001_phongkham.sql` (Thanh) → `002_nhanvien_taikhoan.sql` (Duy) → `003_dichvu.sql` (Duy) → `004_thuoc.sql` (Thắng) → `005_benhnhan.sql` (Huy) → `006_hosobenhan.sql` (Thắng) → `007_phieukham.sql` (Huy) → `008_hoadon_chitiethoadon.sql` (Huy) → `009_chidinhdichvu.sql` (Thắng) → `010_chitietcapthuoc.sql` (Thắng). `011_banggoiso.sql` (Thanh — chốt ở M0 nếu cần lưu "số đang gọi").
+- `SourceCode/DATA/seed/`: cùng số với schema (`002_seed_nhanvien_taikhoan.sql`…). Seed đủ FK, ≥10 bệnh nhân, ≥3 bác sĩ, ≥8 dịch vụ, dữ liệu trải 2 tuần để demo báo cáo.
 - Chuỗi tiếng Việt trong DB: `nvarchar` (hoặc `varchar` + collation hỗ trợ Unicode — theo file 000); ngày `date`; thời điểm `datetime2(0)`; tiền `decimal(18,2)`; đúng/sai `bit`.
 - Ràng buộc: PK + FK đầy đủ; `CHECK` cho giá > 0, số lượng > 0, STT > 0; `UNIQUE(soDienThoai)` cho `TaiKhoan`… theo đặc tả báo cáo; `UNIQUE(cccd)` cho phép NULL.
 - **File schema đã chạy chung chỉ thêm file mới, KHÔNG sửa nội dung cũ** (người khác đã chạy rồi).
@@ -238,6 +238,7 @@ GUI hiển thị đúng chuỗi dưới đây; chuỗi nằm trong `util/MaThong
 | TB14 | `Tên đăng nhập đã tồn tại.` | UC010 tạo tài khoản |
 | TB15 | `Dịch vụ đã ngừng phục vụ, không thể chỉ định.` | UC004 chỉ định |
 | TB16 | `Bệnh nhân này đã có hồ sơ bệnh án.` | UC004 tạo hồ sơ (1 BN — 1 hồ sơ) |
+| TB17 | `Lượt khám này đã được thanh toán.` | Thanh toán dịch vụ cuối lượt (chống thu 2 lần) |
 
 ### 7.2. Thông báo kiểm tra dữ liệu
 
@@ -263,7 +264,7 @@ GUI hiển thị đúng chuỗi dưới đây; chuỗi nằm trong `util/MaThong
 
 ## 8. Quy tắc GUI/JavaFX chung
 
-1. **1 màn hình = 1 cặp file**: `fxml/GD_X.fxml` + `gui/GD_X_Controller implements Initializable`. FXML mở bằng Scene Builder, controller khai trong `fx:controller="vn.nhom15.nhakhoa.gui.GD_X_Controller"`.
+1. **1 màn hình = 1 cặp file**: `gui/GD_X.fxml` + `gui/GD_X_Controller implements Initializable`. FXML mở bằng Scene Builder, controller khai trong `fx:controller="gui.GD_X_Controller"`.
 2. **Điều hướng chỉ qua `App`** (Duy chủ trì): `App.setRoot("GD_X")` đổi màn chính; `App.openModal("GD_X")` mở hộp thoại modal. Session người dùng lưu static tại `App` (`App.session: SessionContext`).
 3. **Controller `initialize()`**: nạp ComboBox, gán `setCellValueFactory` cho từng `TableColumn`, bắt sự kiện click dòng, gọi `loadTableData()`.
 4. **Nạp bảng**: DAO trả `ArrayList<Entity>` → `FXCollections.observableArrayList(ds)` → `table.getItems().clear(); table.setItems(list);`. STT hiển thị tự sinh bằng `setCellFactory` (`getIndex()+1`), KHÔNG lưu STT hiển thị vào DB (STT khám là nghiệp vụ riêng, xem mục 5).
@@ -310,7 +311,7 @@ Mỗi chức năng hoàn thành phải đạt **toàn bộ**:
 - [ ] Nhiều bảng trong 1 thao tác cùng commit/rollback — thử ngắt giữa chừng không rớt dữ liệu một phần (báo cáo yêu cầu "dữ liệu lưu không được một phần").
 - [ ] Nhấn lại nút Lưu/Thu 2 lần không tạo bản ghi trùng (mã/STT qua `BoDem` + ràng buộc UNIQUE).
 - [ ] Trạng thái phiếu khám chỉ đi đúng chiều `CHO_KHAM → DANG_KHAM → HOAN_TAT` và chỉ người được giao chuyển.
-- [ ] Test case ghi trong `docs/evidence/<tên>/test-cases.md`: mã, đầu vào, bước, mong đợi, thực tế, đạt/chưa.
+- [ ] Test case ghi trong `TaiLieu/docs/evidence/<tên>/test-cases.md`: mã, đầu vào, bước, mong đợi, thực tế, đạt/chưa.
 - [ ] Hiển thị đúng format: ngày `dd/MM/yyyy`, tiền `#,##0 ₫`, tiếng Việt không lỗi font (UTF-8 + Segoe UI).
 - [ ] PR được review theo vòng, merge sạch, tự giải thích được từng dòng khi bảo vệ.
 

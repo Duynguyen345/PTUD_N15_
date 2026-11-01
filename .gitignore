@@ -1,7 +1,7 @@
-/target/
-/bin/
-/build/
-/out/
+target/
+bin/
+build/
+out/
 *.class
 *.log
 *.iml
@@ -10,4 +10,4 @@
 .classpath
 .project
 .DS_Store
-src/main/resources/db.properties
+**/db.properties

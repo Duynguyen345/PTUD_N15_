@@ -25,8 +25,8 @@ Tổng 25 — ước lượng khối lượng, không phải điểm môn học.
 | DAO | `dao/BenhNhan_DAO.java`, `dao/PhieuKham_DAO.java`, `dao/HoaDon_DAO.java`, `dao/ChiTietHoaDon_DAO.java` | Thắng, Thanh gọi qua đây — không viết DAO riêng cho phiếu khám |
 | BUS | `bus/BenhNhan_BUS.java`, `bus/PhieuKham_BUS.java`, `bus/HoaDon_BUS.java` | |
 | GUI | `gui/GD_QLBenhNhan_Controller.java` + `fxml/GD_QLBenhNhan.fxml`, `gui/GD_ThuPhi_Controller.java` + `fxml/GD_ThuPhi.fxml`, `gui/GD_LapPhieuKham_Controller.java` + `fxml/GD_LapPhieuKham.fxml`, `gui/GD_TraCuuBenhNhan_Controller.java` + `fxml/GD_TraCuuBenhNhan.fxml` | |
-| SQL | `DATA/schema/005_benhnhan.sql`, `007_phieukham.sql`, `008_hoadon_chitiethoadon.sql` + seed tương ứng trong `DATA/seed/` | 007 phải khai báo `UNIQUE(soThuTu, ngayKham, maPhong)` |
-| Minh chứng | `docs/evidence/huy/` — `design.md`, `implementation.md`, `test-cases.md`, `demo.md`, ảnh/video | |
+| SQL | `SourceCode/DATA/schema/005_benhnhan.sql`, `007_phieukham.sql`, `008_hoadon_chitiethoadon.sql` + seed tương ứng trong `SourceCode/DATA/seed/` | 007 phải khai báo `UNIQUE(soThuTu, ngayKham, maPhong)` |
+| Minh chứng | `TaiLieu/docs/evidence/huy/` — `design.md`, `implementation.md`, `test-cases.md`, `demo.md`, ảnh/video | |
 
 **File dùng chung của người khác mà Huy cần:** `BoDem_DAO` (Thanh — cấp mã/STT), `NhanVien_BUS` (Duy — danh sách bác sĩ), `PhongKham_BUS` (Thanh — phòng đang nhận bệnh), `util/*` (Duy). Thiếu hàm → mở Issue nhờ chủ file, không tự sửa.
 
@@ -61,7 +61,7 @@ Quy tắc nghiệp vụ: (1) `QuyenUtil.kiemTraQuyen(session, ChucVu.LE_TAN)`; (
 
 **SQL:** `005_benhnhan.sql` — bảng `BenhNhan(maBenhNhan PK, hoTen, ngaySinh, soDienThoai, cccd UNIQUE NULL, diaChi, tienSuDiUng)`; CHECK `soDienThoai` 10 số; seed ≥ 10 bệnh nhân.
 
-**Test case bắt buộc (ghi `docs/evidence/huy/test-cases.md`):**
+**Test case bắt buộc (ghi `TaiLieu/docs/evidence/huy/test-cases.md`):**
 
 | Mã | Tình huống | Kết quả mong đợi |
 | --- | --- | --- |

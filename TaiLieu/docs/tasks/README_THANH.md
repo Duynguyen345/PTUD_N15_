@@ -1,6 +1,6 @@
 # NHIỆM VỤ CODE — PHAN CHÍ THANH (24738801) — LUỒNG PHỤ TÁ + HẠ TẦNG CSDL DÙNG CHUNG
 
-> **Tóm tắt:** Thanh gánh 2 phần: (1) luồng phụ tá — theo dõi hàng chờ theo phòng, gọi số, cập nhật bảng số, xác nhận vào khám (UC009); (2) **hạ tầng dùng chung của cả nhóm** — `ConnectDB`, `BoDem_DAO` (cấp mã/STT), file `DATA/schema/000`+`001`, quy trình migration, hướng dẫn cấu hình SQL Server từng máy.
+> **Tóm tắt:** Thanh gánh 2 phần: (1) luồng phụ tá — theo dõi hàng chờ theo phòng, gọi số, cập nhật bảng số, xác nhận vào khám (UC009); (2) **hạ tầng dùng chung của cả nhóm** — `ConnectDB`, `BoDem_DAO` (cấp mã/STT), file `SourceCode/DATA/schema/000`+`001`, quy trình migration, hướng dẫn cấu hình SQL Server từng máy.
 > **Bắt buộc đọc trước:** [README_RULES.md](../../README_RULES.md). Phần hạ tầng của Thanh là nền móng: làm trước, làm chuẩn, cả nhóm phụ thuộc.
 
 ---
@@ -22,13 +22,13 @@ Tổng 25. Backlog có chủ nhiệm (chốt M0): **PT-07 ghế/thiết bị, v�
 
 | Loại | File | Ghi chú |
 | --- | --- | --- |
-| Hạ tầng | `connect/ConnectDB.java`, `dao/BoDem_DAO.java`, `src/main/resources/db.properties.example` | cả nhóm dùng; đổi API phải qua PR + review |
-| SQL hạ tầng | `DATA/schema/000_hatang.sql` (CREATE DATABASE `N15_PTUD_DB` + collation + bảng `BoDem`), `001_phongkham.sql`, `011_banggoiso.sql` (tùy chọn chốt M0) + seed phòng | Thanh kiểm duyệt thứ tự chạy toàn bộ `DATA/` |
+| Hạ tầng | `connect/ConnectDB.java`, `dao/BoDem_DAO.java`, `src/db.properties.example` | cả nhóm dùng; đổi API phải qua PR + review |
+| SQL hạ tầng | `SourceCode/DATA/schema/000_hatang.sql` (CREATE DATABASE `N15_PTUD_DB` + collation + bảng `BoDem`), `001_phongkham.sql`, `011_banggoiso.sql` (tùy chọn chốt M0) + seed phòng | Thanh kiểm duyệt thứ tự chạy toàn bộ `SourceCode/DATA/` |
 | Model | `model/PhongKham.java` | |
 | DAO | `dao/PhongKham_DAO.java` | Hàng chờ **không tạo DAO riêng** — dùng `PhieuKham_DAO` của Huy |
 | BUS | `bus/HangCho_BUS.java`, `bus/PhongKham_BUS.java` | |
 | GUI | `gui/GD_HangCho_Controller.java` + `fxml/GD_HangCho.fxml` | |
-| Minh chứng | `docs/evidence/thanh/` | |
+| Minh chứng | `TaiLieu/docs/evidence/thanh/` | |
 
 **File dùng chéo:** `PhieuKham_DAO` (Huy) — Thanh gọi `layDanhSachTheoNgayVaPhong` và `capNhatTrangThai(maPhieuKham, trangThaiMoi, trangThaiCu)`; thiếu hàm → Issue cho Huy. Huy review PR của Thanh (vòng review), đảm bảo `BoDem`/schema không bị phá.
 
@@ -46,7 +46,7 @@ public class ConnectDB {
 }
 ```
 
-- `db.properties` (đặt `src/main/resources/`, **không commit** — commit `db.properties.example`):
+- `db.properties` (đặt `src/`, **không commit** — commit `db.properties.example`):
 
 ```properties
 db.url=jdbc:sqlserver://localhost:1433;databaseName=N15_PTUD_DB;encrypt=true;trustServerCertificate=true
@@ -73,8 +73,8 @@ Cách hiện thực bắt buộc: bảng `BoDem(loaiMa varchar, ngay date, giaTr
 
 - `000_hatang.sql`: `CREATE DATABASE N15_PTUD_DB` (collation hỗ trợ Unicode tiếng Việt), bảng `BoDem`, (tùy chọn) bảng `BangGoiSo` — **chốt M0**: nếu gọi số cần lưu lại (số đang gọi, phòng, thời điểm, người gọi) thì thêm `011_banggoiso.sql`; nếu chỉ hiển thị tạm trên màn hình thì không cần bảng — **hai người demo 2 máy vẫn an toàn vì trạng thái phiếu nằm ở `PhieuKham.trangThai`**.
 - `001_phongkham.sql`: `PhongKham(maPhong PK PNNN, tenPhong UNIQUE, dangNhanBenh bit DEFAULT 0)`; seed ≥ 4 phòng ("P001 Phòng khám 1"…, 2 phòng bật nhận bệnh).
-- Quy trình migration (Thanh soạn + kiểm duyệt): file đánh số theo phụ thuộc (`000`→`011`, bảng trong từng README thành viên); **file đã chạy chung cấm sửa nội dung** — cần đổi → tạo file số mới `012_*.sql` kèm ghi chú; mỗi schema có seed riêng cùng số trong `DATA/seed/`; Thanh viết `DATA/README.md` hướng dẫn thứ tự chạy.
-- Hướng dẫn cấu hình từng máy (đưa vào `DATA/README.md`): bật TCP/IP 1433 trong SQL Server Configuration Manager + restart; bật SQL auth; lỗi `encrypt=true` thêm `trustServerCertificate=true`; test bằng main() `ConnectDB`.
+- Quy trình migration (Thanh soạn + kiểm duyệt): file đánh số theo phụ thuộc (`000`→`011`, bảng trong từng README thành viên); **file đã chạy chung cấm sửa nội dung** — cần đổi → tạo file số mới `012_*.sql` kèm ghi chú; mỗi schema có seed riêng cùng số trong `SourceCode/DATA/seed/`; Thanh viết `SourceCode/DATA/README.md` hướng dẫn thứ tự chạy.
+- Hướng dẫn cấu hình từng máy (đưa vào `SourceCode/DATA/README.md`): bật TCP/IP 1433 trong SQL Server Configuration Manager + restart; bật SQL auth; lỗi `encrypt=true` thêm `trustServerCertificate=true`; test bằng main() `ConnectDB`.
 
 ## 4. Chi tiết chức năng — UC009: Theo dõi hàng chờ (`GD_HangCho`)
 
@@ -98,7 +98,7 @@ Quy tắc:
 
 **DAO:** `PhongKham_DAO` (`getAllPhongKham`, `layPhongDangNhanBenh`, `capNhatNhanBenh`); hàng chờ đọc qua `PhieuKham_DAO.layDanhSachTheoNgayVaPhong(ngay, maPhong, trangThai)`.
 
-**Test case bắt buộc (ghi `docs/evidence/thanh/test-cases.md`):**
+**Test case bắt buộc (ghi `TaiLieu/docs/evidence/thanh/test-cases.md`):**
 
 | Mã | Tình huống | Kết quả mong đợi |
 | --- | --- | --- |
@@ -124,13 +124,13 @@ PT-02/04 chờ Huy có `PhieuKham_DAO.layDanhSachTheoNgayVaPhong` + `capNhatTran
 
 - Issue prefix `PT-xx`; nhánh `feat/thanh-pt-0x-<ten>`; commit `feat(uc009): goi so va xac nhan vao kham...`.
 - **Reviewer của Thanh: Huy.** PR của Thanh đụng `ConnectDB`/`BoDem_DAO`/schema 000/001 = file toàn nhóm → cần 2 review (Huy + Duy).
-- Thanh duyệt thứ tự chạy `DATA/` khi bất kỳ ai thêm schema mới.
+- Thanh duyệt thứ tự chạy `SourceCode/DATA/` khi bất kỳ ai thêm schema mới.
 
 ## 7. Mốc cá nhân
 
 | Mốc | Thanh phải có |
 | --- | --- |
-| M0 | `ConnectDB` + `BoDem_DAO` + schema 000/001 + seed phòng + `DATA/README.md`; cả nhóm kết nối được DB trên máy mình |
+| M0 | `ConnectDB` + `BoDem_DAO` + schema 000/001 + seed phòng + `SourceCode/DATA/README.md`; cả nhóm kết nối được DB trên máy mình |
 | M1 | `GD_HangCho` chạy với phiếu seed CHO_KHAM |
 | M2 | goiSo/tiepNhanVaoKham chạy DB local, chặn xung đột đồng thời + test-cases.md |
 | M3 | Ghép với Huy (phiếu mới xuất hiện trong hàng chờ) và Thắng (phiếu DANG_KHAM hiện bên bác sĩ) |

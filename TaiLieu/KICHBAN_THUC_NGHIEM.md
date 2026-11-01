@@ -10,9 +10,9 @@
 | --- | --- | --- |
 | P1 | Cài JDK 21 + Maven (hoặc VS Code + Extension Pack for Java); cài SQL Server Express + SSMS | `java -version` báo 21; `mvn -v` chạy được |
 | P2 | Bật TCP/IP 1433 trong SQL Server Configuration Manager, restart dịch vụ; bật SQL auth + user `sa` | `sqlcmd -S localhost -U sa -P <mật khẩu> -Q "SELECT 1"` trả về 1 |
-| P3 | Trong SSMS chạy `DATA/schema/000_hatang.sql` → `010_*.sql` đúng thứ tự | Mỗi file in ra "… OK"; có 13 bảng trong `N15_PTUD_DB` (12 bảng nghiệp vụ + `BoDem`) |
-| P4 | Chạy `DATA/seed/001_…` → `010_…` đúng thứ tự | Mỗi file in ra "… OK"; `PhieuKham` có 6 phiếu (4 hôm nay, 2 hôm qua) |
-| P5 | Copy `src/main/resources/db.properties.example` thành `db.properties`, sửa `db.password` | File tồn tại, KHÔNG hiện trong `git status` |
+| P3 | Trong SSMS chạy `SourceCode/DATA/schema/000_hatang.sql` → `010_*.sql` đúng thứ tự | Mỗi file in ra "… OK"; có 13 bảng trong `N15_PTUD_DB` (12 bảng nghiệp vụ + `BoDem`) |
+| P4 | Chạy `SourceCode/DATA/seed/001_…` → `010_…` đúng thứ tự | Mỗi file in ra "… OK"; `PhieuKham` có 6 phiếu (4 hôm nay, 2 hôm qua) |
+| P5 | Copy `src/db.properties.example` thành `db.properties`, sửa `db.password` | File tồn tại, KHÔNG hiện trong `git status` |
 | P6 | Tại thư mục gốc chạy `mvn clean compile` rồi `mvn javafx:run` | Mở màn hình **Đăng nhập** (nếu lỗi kết nối → xem lại P2–P5) |
 
 ## 2. Tài khoản seed (mật khẩu chung `123456`)
@@ -41,7 +41,7 @@
 | 1.1 | Để trống cả hai ô, bấm Đăng nhập | Alert VL13 | | |
 | 1.2 | `letan` / mật khẩu sai | Alert TB01, ở lại màn đăng nhập | | |
 | 1.3 | `lockacc` / `123456` | Alert TB02 "Tài khoản của bạn đã bị khóa." | | |
-| 1.4 | `letan` / `123456` | Vào GD_Chinh, header "Xin chào, Nguyễn Thị Lan [Lễ tân]"; menu chỉ có: QL hồ sơ, Tra cứu, Thu phí, Lập phiếu | | |
+| 1.4 | `letan` / `123456` | Vào GD_Chinh, header "Xin chào, Hoàng Đình Huy [Lễ tân]"; menu chỉ có: QL hồ sơ, Tra cứu, Thu phí, Lập phiếu | | |
 | 1.5 | Đăng xuất → `bacsi1` / `123456` | Menu chỉ có "Khám và chẩn đoán (UC004)" | | |
 | 1.6 | Đăng xuất → `phuta` / `123456` | Menu chỉ có "Theo dõi hàng chờ (UC009)" | | |
 | 1.7 | Đăng xuất → `quanly` / `123456` | Menu có: Tra cứu, Hàng chờ, QL nhân viên, QL dịch vụ, Báo cáo — **không có** màn lễ tân/bác sĩ | | |
@@ -158,6 +158,39 @@
 
 ---
 
+
+## S11 — Thanh toán dịch vụ, Lịch sử khám, In phiếu, Gợi ý AI (bổ sung theo sơ đồ luồng Word)
+
+| Mã | Tình huống | Kết quả mong đợi | KQ thực tế | Đạt? |
+| --- | --- | --- | --- | --- |
+| TC-S11-01 | `letan` → "Thanh toán dịch vụ" → chọn lượt khám đã HOAN_TAT (từ S6) | Panel phải hiện đúng các dịch vụ đã chỉ định + tổng tiền (đơn giá niêm yết) | | |
+| TC-S11-02 | Tiền khách đưa thiếu tổng | Báo "Tiền khách đưa chưa đủ để thanh toán." | | |
+| TC-S11-03 | Xác nhận thanh toán | Hóa đơn HDyyMMdd… tạo kèm chi tiết từng dịch vụ; lượt khám rời danh sách chờ thanh toán | | |
+| TC-S11-04 | Thanh toán lại cùng lượt khám | Báo TB17 "Lượt khám này đã được thanh toán." | | |
+| TC-S11-05 | `bacsi1` → "Lịch sử khám" | Bảng mọi lượt khám (badge màu theo trạng thái); tìm "Nguyễn" → lọc đúng | | |
+| TC-S11-06 | Double-click một dòng lịch sử | Hộp chi tiết: chẩn đoán, kết quả, thuốc tự mua, trạng thái | | |
+| TC-S11-07 | `letan` → "Lập phiếu khám" → Xem phiếu → In phiếu | Hộp thoại chọn máy in của Windows; in được phiếu (hoặc báo "Không tìm thấy máy in" nếu máy không có) | | |
+| TC-S11-08 | `phuta` → "Hàng chờ theo phòng" → chọn 1 bệnh nhân trong hàng chờ | Hiện banner "AI dự đoán thời gian chờ: ~X phút" (tính theo vị trí hàng chờ + lượt đang khám + thời lượng trung bình) | | |
+| TC-S11-10 | `quanly` → "AI dự báo vật tư" → Chạy dự báo | Bảng vật tư (Găng tay, Khẩu trang, Vật liệu trám, Thuốc tê...) với "Đã dùng 30 ngày" + "Dự báo 2 tuần tới" + ghi chú nhu cầu | | |
+
+---
+
+
+## S12 — Chế độ sáng/tối, Fullscreen, hiển thị dữ liệu
+
+| Mã | Tình huống | Kết quả mong đợi | KQ thực tế | Đạt? |
+| --- | --- | --- | --- | --- |
+| TC-S12-01 | Đăng nhập bất kỳ → bấm "Chế độ tối" ở sidebar | Toàn bộ cửa sổ chuyển nền tối (sidebar/header/card/bảng), chữ sáng, nút "Chế độ sáng" | | |
+| TC-S12-02 | Bấm lại "Chế độ sáng" | Trở lại giao diện sáng như ban đầu | | |
+| TC-S12-03 | Bật chế độ tối → mở từng chức năng | Mọi màn hình (kể cả bảng, form, combobox) hiển thị đúng nền tối, chữ sáng | | |
+| TC-S12-04 | Đăng xuất khi đang chế độ tối → đăng nhập lại | App giữ/khôi phục hiển thị đúng, không lỗi | | |
+| TC-S12-05 | Mở app (đã maximize mặc định) → maximize fullscreen | Nút menu 15px + icon 30px; dòng bảng 42px; không có nút/chữ quá nhỏ | | |
+| TC-S12-06 | Fullscreen → mở Tra cứu / Hồ sơ / Lịch sử khám | Bảng dãn theo khung, đủ cột, không tràn ngang, không trống rỗng | | |
+| TC-S12-07 | Fullscreen → Thu phí / Khám bệnh | Form nằm trong card cân đối, ô nhập dãn theo khung, không bị hẹp cắt chữ | | |
+| TC-S12-08 | Kiểm tra data: Hồ sơ bệnh nhân | Đúng 10 bệnh nhân, đủ CCCD + địa chỉ + tiền sử hiển thị đầy đủ, không trùng lặp | | |
+
+---
+
 ## 3. Bảng tra thông báo chuẩn
 
 | Mã | Nội dung | Mã | Nội dung |
@@ -182,6 +215,6 @@
 
 - Người test: ______________ Ngày: ______ Môi trường: Windows ______ / SQL Server ______ / JDK ______
 - Kết luận từng kịch bản: S0 ☐ S1 ☐ S2 ☐ S3 ☐ S4 ☐ S5 ☐ S6 ☐ S7 ☐ S8 ☐ S9 ☐ S10 ☐
-- Bằng chứng kèm theo (ảnh chụp/alert, câu lệnh SQL kiểm tra DB, file CSV) lưu vào `docs/evidence/<tên thành viên>/`.
+- Bằng chứng kèm theo (ảnh chụp/alert, câu lệnh SQL kiểm tra DB, file CSV) lưu vào `TaiLieu/docs/evidence/<tên thành viên>/`.
 
 > **Lưu ý sau test:** khôi phục trạng thái đã sửa tạm (bật lại `bacsi2`, DV0001) hoặc chạy lại toàn bộ seed để có dữ liệu demo chuẩn.
