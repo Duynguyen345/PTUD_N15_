@@ -1,7 +1,13 @@
+/target/
 /bin/
 /build/
 /out/
 *.class
 *.log
+*.iml
+.idea/
 .settings/
+.classpath
+.project
 .DS_Store
+src/main/resources/db.properties

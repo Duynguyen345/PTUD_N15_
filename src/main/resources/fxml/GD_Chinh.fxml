@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="vn.nhom15.nhakhoa.gui.GD_Chinh_Controller" prefWidth="900" prefHeight="560">
+    <top>
+        <HBox styleClass="header" spacing="16" alignment="CENTER_LEFT">
+            <Label text="PHÒNG KHÁM NHA KHOA SÀI GÒN"/>
+            <Label fx:id="lb_xinChao" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            <Button fx:id="btn_dangXuat" text="Đăng xuất" onAction="#dangXuat"/>
+        </HBox>
+    </top>
+    <left>
+        <VBox fx:id="vb_menu" styleClass="menu-pane" prefWidth="240">
+            <Label text="CHỨC NĂNG" style="-fx-font-weight: bold; -fx-text-fill: #1F618D;"/>
+        </VBox>
+    </left>
+    <center>
+        <VBox styleClass="center-pane" spacing="10" alignment="TOP_LEFT">
+            <Label fx:id="lb_chaoMung" wrapText="true"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1F618D;"/>
+            <Label wrapText="true" text="Chọn chức năng ở menu bên trái. Quản lý dữ liệu qua các màn hình modal (đúng kiến trúc GUI → BUS → DAO)."/>
+        </VBox>
+    </center>
+</BorderPane>

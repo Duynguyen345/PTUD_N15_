@@ -3,7 +3,7 @@
 Đồ án môn học **Phát triển Ứng dụng (Application Development)** — Nhóm 15
 Trường Đại học Công nghiệp TP. Hồ Chí Minh (IUH) — Khoa Công nghệ Thông tin — Học kỳ I, năm học 2026–2027.
 
-> 📚 **Trang tài liệu nhóm:** [README_RULES.md](README_RULES.md) (quy tắc code chung) · [README_THANH.md](docs/tasks/README_THANH.md) · [README_DUY.md](docs/tasks/README_DUY.md) · [README_THANG.md](docs/tasks/README_THANG.md) · [README_HUY.md](docs/tasks/README_HUY.md) (nhiệm vụ từng thành viên) · [README_KHOI_NGHIEP.md](README_KHOI_NGHIEP.md) (đề xuất khởi nghiệp — Chương 5 báo cáo).
+> 📚 **Trang tài liệu nhóm:** [README_RULES.md](README_RULES.md) (quy tắc code chung) · [README_THANH.md](docs/tasks/README_THANH.md) · [README_DUY.md](docs/tasks/README_DUY.md) · [README_THANG.md](docs/tasks/README_THANG.md) · [README_HUY.md](docs/tasks/README_HUY.md) (nhiệm vụ từng thành viên) · [README_KHOI_NGHIEP.md](README_KHOI_NGHIEP.md) (đề xuất khởi nghiệp — Chương 5 báo cáo) · [KICHBAN_THUC_NGHIEM.md](KICHBAN_THUC_NGHIEM.md) (kịch bản kiểm thử S0–S10).
 
 ---
 
