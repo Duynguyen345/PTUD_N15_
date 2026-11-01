@@ -1,141 +1,158 @@
-# NHIỆM VỤ CODE — HOÀNG ĐÌNH HUY (22669751) — LUỒNG PHỤ TÁ + HẠ TẦNG CSDL DÙNG CHUNG
+# NHIỆM VỤ CODE — HOÀNG ĐÌNH HUY (22669751) — LUỒNG LỄ TÂN
 
-> **Tóm tắt:** Huy gánh 2 phần: (1) luồng phụ tá — theo dõi hàng chờ theo phòng, gọi số, cập nhật bảng số, xác nhận vào khám (UC009); (2) **hạ tầng dùng chung của cả nhóm** — `ConnectDB`, `BoDem_DAO` (cấp mã/STT), file `DATA/schema/000`+`001`, quy trình migration, hướng dẫn cấu hình SQL Server từng máy.
-> **Bắt buộc đọc trước:** [README_RULES.md](../../README_RULES.md). Phần hạ tầng của Huy là nền móng: làm trước, làm chuẩn, cả nhóm phụ thuộc.
+> **Tóm tắt:** Huy sở hữu toàn bộ luồng tiếp nhận bên lễ tân: quản lý hồ sơ bệnh nhân (UC002) → thu phí khám (UC005) → lập phiếu khám & cấp STT (UC003) → tra cứu hồ sơ (UC006). Làm đủ **GUI → BUS → DAO → SQL → kiểm thử → minh chứng** cho từng chức năng.
+> **Bắt buộc đọc trước:** [README_RULES.md](../../README_RULES.md) — mọi quy tắc đặt tên, kiểu dữ liệu, thông báo chuẩn, transaction, Git trong file này là ràng buộc. Vi phạm quy tắc đặt tên/kiểu dữ liệu → PR bị reject ngay không cần fix nhỏ.
 
 ---
 
 ## 1. Phạm vi công việc
 
-| Mã | Use case / đầu việc | Màn hình | Điểm nội bộ | Thứ tự làm |
+| Mã | Use case | Màn hình | Điểm nội bộ | Thứ tự làm |
 | --- | --- | --- | --- | --- |
-| PT-01 | **Hạ tầng DB dùng chung**: `ConnectDB`, `BoDem_DAO`, schema 000 + 001 + seed phòng, hướng dẫn migration & cấu hình máy | — | 6 | 1 (cả nhóm chờ) |
-| PT-02 | UC009 — Theo dõi hàng chờ theo phòng | `GD_HangCho` | 4 | 2 |
-| PT-03 | UC009 — Gọi số + cập nhật bảng số đang gọi | (trong `GD_HangCho`) | 3 | 3 |
-| PT-04 | UC009 — Xác nhận vào khám (chuyển `DANG_KHAM`) | (trong `GD_HangCho`) | 4 | 4 |
-| PT-05 | Quản lý phòng khám: bật/tắt nhận bệnh | (trong `GD_HangCho` + menu Quản lý) | 4 | 5 |
-| PT-06 | Kiểm thử, tài liệu, demo | — | 4 | song song |
+| LT-01 | UC002 — Quản lý hồ sơ bệnh nhân | `GD_QLBenhNhan` | 5 | 1 (làm đầu, mọi người phụ thuộc) |
+| LT-02 | UC005 — Thu tiền phí khám | `GD_ThuPhi` | 6 | 2 |
+| LT-03 | UC003 — Tiếp nhận & lập phiếu khám, cấp STT | `GD_LapPhieuKham` | 6 | 3 |
+| LT-04 | UC006 — Tra cứu hồ sơ bệnh nhân | `GD_TraCuuBenhNhan` | 3 | 4 |
+| LT-05 | Kiểm thử, tài liệu, demo cho cả 4 chức năng | — | 5 | song song |
 
-Tổng 25. Backlog có chủ nhiệm (chốt M0): **PT-07 ghế/thiết bị, vệ sinh phòng, hàng chờ phẫu thuật, hỗ trợ vật tư** — không dùng cờ `dangNhanBenh` giả làm tình trạng ghế; cần mô hình bổ sung.
+Tổng 25 — ước lượng khối lượng, không phải điểm môn học. Backlog có chủ nhiệm (không bắt buộc bản lõi, chốt ở M0): **LT-06 thanh toán dịch vụ cuối lượt** (cần mô hình liên kết hóa đơn–lượt khám; phối hợp Thắng cung cấp dịch vụ đã thực hiện).
 
-## 2. File sở hữu (quy tắc một-chủ)
+## 2. File sở hữu (quy tắc một-chủ — người khác dùng lại, không sửa)
 
 | Loại | File | Ghi chú |
 | --- | --- | --- |
-| Hạ tầng | `connect/ConnectDB.java`, `dao/BoDem_DAO.java`, `src/main/resources/db.properties.example` | cả nhóm dùng; đổi API phải qua PR + review Huy |
-| SQL hạ tầng | `DATA/schema/000_hatang.sql` (CREATE DATABASE `N15_PTUD_DB` + collation + bảng `BoDem`), `001_phongkham.sql`, `011_banggoiso.sql` (tùy chọn chốt M0) + seed phòng | Huy kiểm duyệt thứ tự chạy toàn bộ `DATA/` |
-| Model | `model/PhongKham.java` | |
-| DAO | `dao/PhongKham_DAO.java` | Hàng chờ **không tạo DAO riêng** — dùng `PhieuKham_DAO` của Thanh |
-| BUS | `bus/HangCho_BUS.java`, `bus/PhongKham_BUS.java` | |
-| GUI | `gui/GD_HangCho_Controller.java` + `fxml/GD_HangCho.fxml` | |
-| Minh chứng | `docs/evidence/huy/` | |
+| Model | `model/BenhNhan.java`, `model/PhieuKham.java`, `model/HoaDon.java`, `model/ChiTietHoaDon.java`, `model/TrangThaiPhieuKham.java` | Huy là chủ file nhóm này |
+| DAO | `dao/BenhNhan_DAO.java`, `dao/PhieuKham_DAO.java`, `dao/HoaDon_DAO.java`, `dao/ChiTietHoaDon_DAO.java` | Thắng, Thanh gọi qua đây — không viết DAO riêng cho phiếu khám |
+| BUS | `bus/BenhNhan_BUS.java`, `bus/PhieuKham_BUS.java`, `bus/HoaDon_BUS.java` | |
+| GUI | `gui/GD_QLBenhNhan_Controller.java` + `fxml/GD_QLBenhNhan.fxml`, `gui/GD_ThuPhi_Controller.java` + `fxml/GD_ThuPhi.fxml`, `gui/GD_LapPhieuKham_Controller.java` + `fxml/GD_LapPhieuKham.fxml`, `gui/GD_TraCuuBenhNhan_Controller.java` + `fxml/GD_TraCuuBenhNhan.fxml` | |
+| SQL | `DATA/schema/005_benhnhan.sql`, `007_phieukham.sql`, `008_hoadon_chitiethoadon.sql` + seed tương ứng trong `DATA/seed/` | 007 phải khai báo `UNIQUE(soThuTu, ngayKham, maPhong)` |
+| Minh chứng | `docs/evidence/huy/` — `design.md`, `implementation.md`, `test-cases.md`, `demo.md`, ảnh/video | |
 
-**File dùng chéo:** `PhieuKham_DAO` (Thanh) — Huy gọi `layDanhSachTheoNgayVaPhong` và `capNhatTrangThai(maPhieuKham, trangThaiMoi, trangThaiCu)`; thiếu hàm → Issue cho Thanh. Huy review PR của Thanh (vòng review), đảm bảo `BoDem`/schema không bị phá.
+**File dùng chung của người khác mà Huy cần:** `BoDem_DAO` (Thanh — cấp mã/STT), `NhanVien_BUS` (Duy — danh sách bác sĩ), `PhongKham_BUS` (Thanh — phòng đang nhận bệnh), `util/*` (Duy). Thiếu hàm → mở Issue nhờ chủ file, không tự sửa.
 
-## 3. Chi tiết phần hạ tầng (PT-01 — làm trước mọi người)
+## 3. Chi tiết chức năng
 
-### 3.1. `ConnectDB` — nơi duy nhất cấp Connection
+### 3.1. LT-01 — UC002: Quản lý hồ sơ bệnh nhân (`GD_QLBenhNhan`)
 
-```java
-public class ConnectDB {
-    private static Connection con;
-    private static final ConnectDB instance = new ConnectDB();
-    public static ConnectDB getInstance() { return instance; }
-    public void connect() { /* đọc db.properties → DriverManager.getConnection */ }
-    public Connection getConnection() { /* trả con; nếu null/đóng → tự nối lại */ }
-}
-```
+**Mục tiêu (đặc tả):** tra cứu, khởi tạo hồ sơ mới hoặc cập nhật lý lịch hành chính, tiền sử dị ứng/bệnh lý; kiểm tra trùng CCCD/SĐT trước khi lưu; sinh mã bệnh nhân tự động.
 
-- `db.properties` (đặt `src/main/resources/`, **không commit** — commit `db.properties.example`):
+**GUI — `GD_QLBenhNhan.fxml` + `GD_QLBenhNhan_Controller`:**
 
-```properties
-db.url=jdbc:sqlserver://localhost:1433;databaseName=N15_PTUD_DB;encrypt=true;trustServerCertificate=true
-db.user=sa
-db.password=<máy của bạn>
-```
+| Control | @FXML tên | Ghi chú |
+| --- | --- | --- |
+| TableView danh sách BN | `table_benhNhan` | cột `cl_stt` (tự sinh), `cl_ma`, `cl_hoTen`, `cl_sdt`, `cl_ngaySinh` (`FormatUtil` dd/MM/yyyy) |
+| TextField | `txt_hoTen`, `txt_sdt`, `txt_cccd`, `txt_diaChi`, `txt_tienSuDiUng` | trim trước khi validate |
+| DatePicker | `dp_ngaySinh` | |
+| Button | `btn_them`, `btn_sua`, `btn_lamMoi` | Sửa lấy từ selection của bảng |
 
-- `connect()` đọc từ properties; cấm hardcode user/password trong code (RULES mục 12.1).
-- Viết `main()` test kết nối in 1 dòng "Kết nối N15_PTUD_DB thành công" — mọi thành viên chạy được main này trước khi code.
+Trình tự nút: `kiemTraDuLieu()` (VL01, VL02, VL03, VL04) → gọi BUS → thành công: Alert + `loadTableData()` + `clearFields()`; thất bại: Alert đúng message nhận về.
 
-### 3.2. `BoDem_DAO` — cấp mã tự động nguyên tử (cấm MAX+1/COUNT+1)
+**BUS — `BenhNhan_BUS`:**
 
 ```java
-public static String layMaMoi(Connection con, String loaiMa, LocalDate ngay)   // con do BUS truyền khi trong transaction
-public static int laySoThuTuTiepTheo(Connection con, LocalDate ngay, String maPhong)
+public BenhNhan taoHoSo(SessionContext session, String hoTen, LocalDate ngaySinh,
+                        String sdt, String cccd, String diaChi, String tienSuDiUng)
+public BenhNhan capNhatHoSo(SessionContext session, BenhNhan benhNhan)
 ```
 
-Cách hiện thực bắt buộc: bảng `BoDem(loaiMa varchar, ngay date, giaTri int, PK(loaiMa, ngay))` — cấp bằng `UPDATE BoDem SET giaTri = giaTri + 1 OUTPUT inserted.giaTri WHERE loaiMa=? AND ngay=?` (khóa dòng trong transaction, 2 máy chạy đồng thời không trùng); chưa có dòng → INSERT giá trị 1. Hết dải 9999 → ném RuntimeException mô tả rõ (GUI báo TB09).
+Quy tắc nghiệp vụ: (1) `QuyenUtil.kiemTraQuyen(session, ChucVu.LE_TAN)`; (2) validate theo bảng RULES; (3) trùng CCCD (nếu nhập) → ném **TB13**; (4) trùng SĐT → trả danh sách BN trùng để GUI hỏi "Vẫn tạo hồ sơ mới?" (SĐT **không** là mã định danh duy nhất — quyết định nhóm đã chốt); (5) mã `BNyyMMddNNNN` cấp qua `BoDem_DAO` trong transaction.
 
-- Format mã theo RULES mục 5: `NVyyMMddNNNN`, `BNyyMMddNNNN`, `HSyyMMddNNNN`, `PKyyMMddNNNN`, `HDyyMMddNNNN`, `DVNNNN`, `THNNNN`, `PNNN` — `layMaMoi` trả chuỗi hoàn chỉnh.
-- Viết `main()` test: gọi 2 lần liên tiếp tăng đúng; gọi từ 2 thread → không trùng.
+**DAO — `BenhNhan_DAO`:** `themBenhNhan`, `suaBenhNhan`, `getAllBenhNhan`, `layBenhNhanTheoMa`, `layBenhNhanTheoSDT`, `layBenhNhanTheoCCCD`, `demBenhNhanHomNay`. Liệt kê đúng cột, không `SELECT *`.
 
-### 3.3. SQL hạ tầng + quy trình migration
-
-- `000_hatang.sql`: `CREATE DATABASE N15_PTUD_DB` (collation hỗ trợ Unicode tiếng Việt), bảng `BoDem`, (tùy chọn) bảng `BangGoiSo` — **chốt M0**: nếu gọi số cần lưu lại (số đang gọi, phòng, thời điểm, người gọi) thì thêm `011_banggoiso.sql`; nếu chỉ hiển thị tạm trên màn hình thì không cần bảng — **hai người phụ tá demo 2 máy vẫn an toàn vì trạng thái phiếu nằm ở `PhieuKham.trangThai`**.
-- `001_phongkham.sql`: `PhongKham(maPhong PK PNNN, tenPhong UNIQUE, dangNhanBenh bit DEFAULT 0)`; seed ≥ 4 phòng ("P001 Phòng khám 1"…, 2 phòng bật nhận bệnh).
-- Quy trình migration (Huy soạn + kiểm duyệt): file đánh số theo phụ thuộc (`000`→`011`, bảng trong từng README thành viên); **file đã chạy chung cấm sửa nội dung** — cần đổi → tạo file số mới `012_*.sql` kèm ghi chú; mỗi schema có seed riêng cùng số trong `DATA/seed/`; Huy viết `DATA/README.md` hướng dẫn thứ tự chạy.
-- Hướng dẫn cấu hình từng máy (đưa vào `DATA/README.md`): bật TCP/IP 1433 trong SQL Server Configuration Manager + restart; bật SQL auth; lỗi `encrypt=true` thêm `trustServerCertificate=true`; test bằng main() `ConnectDB`.
-
-## 4. Chi tiết chức năng — UC009: Theo dõi hàng chờ (`GD_HangCho`)
-
-**Mục tiêu (đặc tả):** truy xuất danh sách chờ theo phòng khám và STT; danh sách rỗng → "Hiện không có bệnh nhân đang chờ khám"; gọi số; xác nhận vào khám.
-
-**GUI — `GD_HangCho.fxml`:** `cbb_phong` ← `PhongKham_BUS.danhSachPhongDangNhanBenh(session)`; `table_hangCho` (STT, mã phiếu, tên BN, lý do khám, trạng thái); `table_dangKham` (phiếu đã vào khám của phòng hôm nay); **bảng số hiển thị**: `lb_soDangGoi` (label chữ lớn) + `lb_phongDangGoi`; `btn_goSo`, `btn_xacNhanVaoKham`, `btn_taiLai` (refresh định kỳ 10 giây bằng `Timeline` — hàng chờ phải thấy phiếu mới của lễ tân không cần bấm tay).
-
-**BUS — `HangCho_BUS`:**
-
-```java
-public List<PhieuKham> danhSachCho(SessionContext session, LocalDate ngay, String maPhong)   // CHO_KHAM
-public PhieuKham goiSo(SessionContext session, String maPhieuKham)                            // hiển thị bảng số
-public void tiepNhanVaoKham(SessionContext session, String maPhieuKham)                       // CHO_KHAM → DANG_KHAM
-```
-
-Quy tắc:
-- `danhSachCho`: quyền PHU_TA; rỗng → GUI Alert **TB07** (không phải lỗi, hiển thị dịu dàng).
-- `goiSo`: quyền PHU_TA; chỉ phiếu `CHO_KHAM` của phòng mình phụ trách; **không đổi trạng thái phiếu** (gọi ≠ vào khám) — cập nhật hiển thị `lb_soDangGoi` (+ ghi `BangGoiSo` nếu M0 chốt có bảng). Người khác bấm gọi phiếu đang gọi → TB10.
-- `tiepNhanVaoKham`: điều kiện `AND trangThai='CHO_KHAM'` + phòng khớp; `UPDATE` qua `PhieuKham_DAO.capNhatTrangThai(maPhieuKham, DANG_KHAM, CHO_KHAM)` — **0 dòng ảnh hưởng → TB10** ("đã thay đổi, tải lại") — đây là lớp chặn khi 2 phụ tá cùng bấm 1 phiếu.
-- Chỉ Huy chuyển `DANG_KHAM`; bác sĩ (Thắng) chỉ đọc danh sách theo trạng thái.
-
-**DAO:** `PhongKham_DAO` (`getAllPhongKham`, `layPhongDangNhanBenh`, `capNhatNhanBenh`); hàng chờ đọc qua `PhieuKham_DAO.layDanhSachTheoNgayVaPhong(ngay, maPhong, trangThai)`.
+**SQL:** `005_benhnhan.sql` — bảng `BenhNhan(maBenhNhan PK, hoTen, ngaySinh, soDienThoai, cccd UNIQUE NULL, diaChi, tienSuDiUng)`; CHECK `soDienThoai` 10 số; seed ≥ 10 bệnh nhân.
 
 **Test case bắt buộc (ghi `docs/evidence/huy/test-cases.md`):**
 
 | Mã | Tình huống | Kết quả mong đợi |
 | --- | --- | --- |
-| TC-PT01 | Hàng chờ rỗng | TB07, màn hình không lỗi |
-| TC-PT02 | Lễ tân lập phiếu → hàng chờ hiện trong 10 giây (Timeline) | Đúng |
-| TC-PT03 | Gọi số → bảng số đúng STT + phòng, trạng thái phiếu **vẫn** CHO_KHAM | Đúng |
-| TC-PT04 | Xác nhận vào khám → DANG_KHAM, rời hàng chờ | Đúng |
-| TC-PT05 | **2 máy đồng thời xác nhận vào khám cùng phiếu** | 1 máy thành công, máy kia TB10 |
-| TC-PT06 | Bấm vào khám phiếu HOAN_TAT | TB10 |
-| TC-PT07 | Phụ tá phòng khác xác nhận phiếu phòng mình | TB10/TB08 |
-| TC-PT08 | `BoDem` gọi 2 lần liên tiếp → mã/STT tăng đúng, 2 thread không trùng | Đúng |
-| TC-PT09 | Ngắt DB giữa transaction vào khám | Rollback, phiếu vẫn CHO_KHAM |
-| TC-PT10 | Tắt/bật phòng nhận bệnh → danh sách phòng của Thanh thay đổi theo | Đúng |
+| TC-LT01-01 | Tạo hồ sơ đủ dữ liệu hợp lệ | Lưu thành công, mã `BNyyMMdd0001`, đọc lại đúng |
+| TC-LT01-02 | Bỏ trống họ tên | Alert VL01, không lưu |
+| TC-LT01-03 | SĐT 9 số | Alert VL02 |
+| TC-LT01-04 | CCCD 11 số | Alert VL03 |
+| TC-LT01-05 | CCCD trùng BN khác | Alert TB13 |
+| TC-LT01-06 | SĐT trùng | GUI hỏi xác nhận, chọn Có → vẫn tạo |
+| TC-LT01-07 | Sửa hồ sơ từ dòng chọn | Cập nhật đúng dòng, bảng refresh |
+| TC-LT01-08 | Ngắt mạng DB giữa lúc lưu | TB09, DB không có bản ghi một phần |
 
-## 5. Thứ tự làm & phụ thuộc
+### 3.2. LT-02 — UC005: Thu tiền phí khám (`GD_ThuPhi`)
+
+**Mục tiêu (đặc tả):** thu phí khám ban đầu **trước khi lập phiếu**; hiển thị mức phí; chống thu trùng ("Bệnh nhân đã hoàn tất phí khám").
+
+**Chốt nghiệp vụ (thống nhất M0 — áp dụng cho bản lõi):** phí khám ban đầu là 1 dòng dịch vụ đặc biệt seed sẵn: `DichVu` mã `DV0001`, tên "Phí khám ban đầu" (giá do chủ phòng khám chỉnh trên UC007). Thu phí = tạo `HoaDon` (`daThanhToan = 1`) + `ChiTietHoaDon(DV0001)`. Hóa đơn phí này chưa gắn phiếu → khi lập phiếu (LT-03) gắn vào `PhieuKham.maHoaDonPhiKham` (cột UNIQUE do Huy thêm vào 007 — đã được nhóm chốt).
+
+**GUI — `GD_ThuPhi.fxml`:** `txt_timBN` (mã/SĐT) + `btn_tim`; panel thông tin BN; `lb_mucPhi` (đọc `DichVu` DV0001 qua `DichVu_BUS` của Duy — hàm `layDichVuTheoMa`, hiển thị `#,##0 ₫`); `cbb_hinhThuc` (`TIEN_MAT`/`CHUYEN_KHOAN`); `txt_tienKhachDua`; `lb_tienThua` tự tính; `btn_thuPhi`. Validate: chọn BN (VL05), tiền khách đưa ≥ mức phí.
+
+**BUS — `HoaDon_BUS`:**
+
+```java
+public HoaDon thuPhiKham(SessionContext session, String maBenhNhan,
+                         String hinhThucThanhToan, BigDecimal tienKhachDua)
+public List<HoaDon> layHoaDonPhiChuaDung(SessionContext session, String maBenhNhan) // hỗ trợ "dùng hóa đơn đã thu"
+```
+
+Quy tắc: quyền LE_TAN; nếu tồn tại hóa đơn phí khám đã thanh toán **chưa gắn phiếu nào** của BN → ném **TB04** (GUI đồng thời hiện nút "Dùng hóa đơn đã thu" để tiếp tục, không thu lại); `ngayThu = LocalDateTime.now()`; mã `HDyyMMddNNNN` qua `BoDem_DAO`; snapshot `donGia` vào `ChiTietHoaDon` tại thời điểm thu (giá đổi sau không ảnh hưởng hóa đơn cũ).
+
+**DAO — `HoaDon_DAO` + `ChiTietHoaDon_DAO`:** `themHoaDon` (overload nhận `Connection` cho transaction), `layHoaDonTheoMa`, `layHoaDonPhiChuaDungTheoBN`, `themChiTiet`, `layChiTietTheoHoaDon`.
+
+**SQL:** `008_hoadon_chitiethoadon.sql` — `HoaDon(maHoaDon PK, ngayThu datetime2(0), hinhThucThanhToan CHECK IN (TIEN_MAT, CHUYEN_KHOAN), daThanhToan bit, tienKhachDua decimal(18,2), FK BN/NV)`, `ChiTietHoaDon(PK ghép maHoaDon+maDichVu, soLuong CHECK >0, donGia, thanhTien PERSISTED = soLuong*donGia)`; seed `DV0001`.
+
+**Test case bắt buộc:** thu thành công (TC-LT02-01); thu trùng → TB04 (02); tiền khách đưa thiếu → VL06 (03); tiền thừa đúng (04); hóa đơn + chi tiết cùng commit, ngắt giữa chừng rollback hết (05); hóa đơn đọc lại đúng format tiền (06); dùng hóa đơn đã thu để lập phiếu không phát sinh thêm (07).
+
+### 3.3. LT-03 — UC003: Lập phiếu khám & cấp STT (`GD_LapPhieuKham`)
+
+**Mục tiêu (đặc tả):** chọn bệnh nhân đã thu phí, chọn Bác sĩ/Phòng, nhập lý do khám; kiểm tra trạng thái ca làm việc; tạo mã phiếu + STT tự động, đưa vào hàng chờ; trạng thái `CHO_KHAM`.
+
+**GUI — `GD_LapPhieuKham.fxml`:** `txt_timBN`/`btn_tim` (chỉ BN đã có hóa đơn phí chưa dùng); panel thông tin BN + hóa đơn phí; `cbb_bacSi` ← `NhanVien_BUS.danhSachBacSiDangLamViec(session)` (Duy); `cbb_phong` ← `PhongKham_BUS.danhSachPhongDangNhanBenh(session)` (Thanh); `txt_lyDoKham`; `lb_soThuTuDuKien` (preview); `btn_lapPhieu`, `btn_in` (mở modal xem phiếu kiểu Bill N11).
+
+**BUS — `PhieuKham_BUS`:**
+
+```java
+public PhieuKham lapPhieuKham(SessionContext session, String maBenhNhan,
+                              String maBacSi, String maPhong, String lyDoKham,
+                              String maHoaDonPhiKham)
+```
+
+Quy tắc (đúng thứ tự): quyền LE_TAN → VL05/VL07/VL08 → kiểm "ca làm việc" bản lõi: bác sĩ có `TaiKhoan.trangThai = HOAT_DONG` **và** phòng `dangNhanBenh = 1`, vi phạm → **TB03** → transaction (1 commit/rollback): `BoDem_DAO.layMaMoi(con,"PK",ngay)` + `laySoThuTuTiepTheo(con, ngay, maPhong)` + `PhieuKham_DAO.themPhieuKham(con, ...)` với `trangThai = CHO_KHAM`, gắn `maHoaDonPhiKham` (UNIQUE — hóa đơn đã gắn sẽ bị DB chặn thu lại).
+
+**DAO — `PhieuKham_DAO`:** `themPhieuKham(con, phieuKham)`, `layPhieuKhamTheoMa`, `layDanhSachTheoNgayVaPhong`, `layDanhSachTheoBacSi`, `capNhatTrangThai(maPhieuKham, trangThaiMoi, trangThaiCu)` (UPDATE có điều kiện + trả số dòng ảnh hưởng — Thanh/Thắng dùng), `layTheoBN`. Cập nhật **chỉ đúng cột**, cấm UPDATE cả object cũ.
+
+**SQL:** `007_phieukham.sql` — `PhieuKham(maPhieuKham PK, ngayKham date, soThuTu int CHECK>0, lyDoKham nvarchar, chanDoan NULL, ketQuaDieuTri NULL, ghiChuThuocSuDung NULL, ghiChuThuocTuMua NULL, trangThai nvarchar(40) DEFAULT 'CHO_KHAM', FK BN/NV(bác sĩ)/PhongKham/HoSoBenhAn NULL, maHoaDonPhiKham UNIQUE FK HoaDon)` + `UNIQUE(ngayKham, maPhong, soThuTu)`.
+
+**Test case bắt buộc:** lập phiếu đủ điều kiện → STT = 1 (TC-LT03-01); phiếu thứ 2 cùng phòng/ngày STT = 2 (02); STT khác phòng độc lập (03); bác sĩ không nhận bệnh → TB03 (04); phòng tắt nhận bệnh → TB03 (05); gắn hóa đơn phí đã dùng → DB chặn UNIQUE → TB09/TB10 (06); ngắt giữa transaction → không có mã phiếu chết, bộ đếm không nhảy (07); nhấn Lập phiếu 2 lần nhanh → 2 phiếu khác mã khác STT, không trùng (08); in xem phiếu đúng thông tin (09).
+
+### 3.4. LT-04 — UC006: Tra cứu hồ sơ bệnh nhân (`GD_TraCuuBenhNhan`)
+
+**Mục tiêu (đặc tả):** tìm theo mã BN hoặc SĐT (mở rộng: họ tên), hiển thị hồ sơ; không thấy → "Không tìm thấy hồ sơ bệnh nhân".
+
+**GUI — `GD_TraCuuBenhNhan.fxml`:** `cbb_tieuChi` (Mã/SĐT/Họ tên) + `txt_tuKhoa` + `btn_tim`; `table_ketQua`; double-click dòng → modal chi tiết: thông tin hành chính + tiền sử + danh sách phiếu khám của BN (đọc `PhieuKham_DAO.layTheoBN`, chỉ đọc).
+
+**BUS — `BenhNhan_BUS.traCuu(session, tieuChi, tuKhoa)`:** quyền LE_TAN (Quản lý cũng được xem); không thấy → trả `List` rỗng, GUI Alert **TB05**. Mã/SĐT khớp chính xác qua SQL `WHERE`; họ tên lọc client-side theo mẫu N11 (nạp danh sách rồi `contains`).
+
+**Test case bắt buộc:** tìm theo mã đúng (TC-LT04-01); tìm SĐT (02); tên không dấu vẫn ra (03); không thấy → TB05 (04); tra cứu rỗng khóa mở chi tiết (05); hiển thị lịch sử phiếu đúng thứ tự ngày (06).
+
+## 4. Thứ tự làm & phụ thuộc
 
 ```
-PT-01 hạ tầng ──► (cả nhóm bắt đầu M1) ──► PT-02 hàng chờ ──► PT-03 gọi số ──► PT-04 vào khám ──► PT-05 phòng
-PT-02/04 chờ Thanh có `PhieuKham_DAO.layDanhSachTheoNgayVaPhong` + `capNhatTrangThai` — chốt chữ ký M0; trước đó dùng seed phiếu CHO_KHAM.
+M0 (nhóm): pom/khung App/ConnectDB/BoDem_Dao/util/schema 000-003 ──► LT-01 Hồ sơ ──► LT-02 Thu phí ──► LT-03 Lập phiếu ──► LT-04 Tra cứu
+LT-03 chờ Duy có `danhSachBacSiDangLamViec` + Thanh có `danhSachPhongDangNhanBenh` (M1) — trước đó dùng fake ghi rõ FAKE trong controller.
 ```
 
-## 6. Git workflow cá nhân
+## 5. Git workflow cá nhân
 
-- Issue prefix `PT-xx`; nhánh `feat/huy-pt-0x-<ten>`; commit `feat(uc009): goi so va xac nhan vao kham...`.
-- **Reviewer của Huy: Thanh.** PR của Huy đụng `ConnectDB`/`BoDem_DAO`/schema 000/001 = file toàn nhóm → cần 2 review (Thanh + Duy).
-- Huy duyệt thứ tự chạy `DATA/` khi bất kỳ ai thêm schema mới.
+- Issue prefix `LT-xx`; nhánh `feat/huy-lt-0x-<ten>`; commit `feat(uc002): tao ho so benh nhan...`.
+- **Reviewer của Huy: Thanh.** PR đụng `PhieuKham_DAO`/schema 007 (file dùng chéo) phải mời thêm Thắng + Thanh.
+- Cấm sửa file của người khác; cần hàm mới ở `BoDem_DAO`/`NhanVien_BUS`/`PhongKham_BUS` → Issue cho chủ file.
 
-## 7. Mốc cá nhân
+## 6. Mốc cá nhân
 
 | Mốc | Huy phải có |
 | --- | --- |
-| M0 | `ConnectDB` + `BoDem_DAO` + schema 000/001 + seed phòng + `DATA/README.md`; cả nhóm kết nối được DB trên máy mình |
-| M1 | `GD_HangCho` chạy với phiếu seed CHO_KHAM |
-| M2 | goiSo/tiepNhanVaoKham chạy DB local, chặn xung đột đồng thời + test-cases.md |
-| M3 | Ghép với Thanh (phiếu mới xuất hiện trong hàng chờ) và Thắng (phiếu DANG_KHAM hiện bên bác sĩ) |
-| M4 | design.md (có sơ đồ 2 phụ tá đồng thời) + demo.md |
+| M0 | Hoàn thiện schema 005/007/008; entity nhóm mình chắc `String`/`LocalDate`/`BigDecimal` đúng RULES |
+| M1 | 4 màn hình chạy với FAKE data |
+| M2 | 4 chức năng chạy DB local + test-cases.md hoàn chỉnh |
+| M3 | Luồng demo chặng lễ tân chạy trơn với Thanh/Thắng/Duy |
+| M4 | design.md + demo.md + ảnh/video; tập trả lời câu hỏi bảo vệ |
 
-## 8. Chuẩn bị bảo vệ
+## 7. Chuẩn bị bảo vệ (thanh điểm CLO6/CLO2/CLO7)
 
-Lần theo: **bấm "Xác nhận vào khám" → `HangCho_BUS.tiepNhanVaoKham` (quyền → WHERE `trangThai='CHO_KHAM'` + phòng khớp) → `PhieuKham_DAO.capNhatTrangThai` → đếm số dòng → 0 dòng = TB10**. Sẵn sàng giải thích: vì sao cấp mã qua `BoDem` + OUTPUT thay vì `MAX+1` (2 máy đồng thời); vì sao gọi số không đổi trạng thái; cơ chế nào bảo đảm 2 phụ tá không cùng đưa 1 bệnh nhân vào khám (conditional UPDATE + kiểm số dòng); hướng dẫn một máy mới kết nối DB từng bước.
+Lần theo được 1 thao tác: **nút "Lập phiếu" → `PhieuKham_BUS.lapPhieuKham` (quyền → validate → TB03 → transaction: mã + STT + INSERT) → `PhieuKham_DAO` → bảng `PhieuKham`**. Sẵn sàng giải thích: vì sao mã/SĐT là `String`; vì sao tiền là `BigDecimal`; vì sao STT UNIQUE theo (ngày, phòng) và cấp qua `BoDem` thay vì `MAX+1`; vì sao UPDATE trạng thái có điều kiện; một test case khó nhất (TC-LT03-08 nhấn 2 lần).

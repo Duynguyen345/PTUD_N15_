@@ -1,7 +1,7 @@
 # NHIỆM VỤ CODE — HUỲNH QUỐC THẮNG (22693891) — LUỒNG BÁC SĨ
 
 > **Tóm tắt:** Thắng sở hữu luồng chuyên môn: nhận danh sách khám → xem tiền sử bệnh án → ghi chẩn đoán → chỉ định dịch vụ → cấp thuốc → lưu kết quả → hoàn tất lượt khám (UC004), cộng phần xem tiền sử bệnh án điện tử.
-> **Bắt buộc đọc trước:** [README_RULES.md](../../README_RULES.md). Thắng dùng lại entity `PhieuKham`/`BenhNhan` của Thanh và `DichVu` của Duy qua DAO/BUS của họ — **không tạo bản sao**.
+> **Bắt buộc đọc trước:** [README_RULES.md](../../README_RULES.md). Thắng dùng lại entity `PhieuKham`/`BenhNhan` của Huy và `DichVu` của Duy qua DAO/BUS của họ — **không tạo bản sao**.
 
 ---
 
@@ -16,7 +16,7 @@
 | BS-05 | UC004 — Lưu kết quả + hoàn tất lượt khám | (trong `GD_KhamBenh`) | 4 | 5 |
 | BS-06 | Kiểm thử, tài liệu, demo | — | 4 | song song |
 
-Tổng 21 + 4 phần tài liệu/demo của các chức năng = 25. Backlog có chủ nhiệm (chốt M0): **BS-08 phẫu thuật/chờ phẫu thuật & kết quả** (cần trạng thái và mô hình mới, phối hợp Huy về hàng chờ phẫu thuật).
+Tổng 21 + 4 phần tài liệu/demo của các chức năng = 25. Backlog có chủ nhiệm (chốt M0): **BS-08 phẫu thuật/chờ phẫu thuật & kết quả** (cần trạng thái và mô hình mới, phối hợp Thanh về hàng chờ phẫu thuật).
 
 ## 2. File sở hữu (quy tắc một-chủ)
 
@@ -29,7 +29,7 @@ Tổng 21 + 4 phần tài liệu/demo của các chức năng = 25. Backlog có 
 | SQL | `DATA/schema/004_thuoc.sql`, `006_hosobenhan.sql`, `009_chidinhdichvu.sql`, `010_chitietcapthuoc.sql` + seed | |
 | Minh chứng | `docs/evidence/thang/` | |
 
-**File dùng chéo:** `PhieuKham_DAO` (Thanh) — Thắng gọi `capNhatTrangThai`, `layDanhSachTheoBacSi`; nếu thiếu hàm → Issue cho Thanh. `DichVu_BUS.danhSachDichVuDangPhucVu` (Duy) — nạp ComboBox chỉ định. `BoDem_DAO` (Huy) — mã `HSyyMMddNNNN` khi tạo hồ sơ bệnh án. **Quyền chuyển `HOAN_TAT` thuộc duy nhất về `KhamBenh_BUS` của Thắng.**
+**File dùng chéo:** `PhieuKham_DAO` (Huy) — Thắng gọi `capNhatTrangThai`, `layDanhSachTheoBacSi`; nếu thiếu hàm → Issue cho Huy. `DichVu_BUS.danhSachDichVuDangPhucVu` (Duy) — nạp ComboBox chỉ định. `BoDem_DAO` (Thanh) — mã `HSyyMMddNNNN` khi tạo hồ sơ bệnh án. **Quyền chuyển `HOAN_TAT` thuộc duy nhất về `KhamBenh_BUS` của Thắng.**
 
 ## 3. Chi tiết chức năng — UC004: Ghi nhận khám và chẩn đoán (`GD_KhamBenh`)
 
@@ -39,13 +39,13 @@ Tổng 21 + 4 phần tài liệu/demo của các chức năng = 25. Backlog có 
 
 **GUI:** `table_danhSach` — phiếu khám có `maNhanVien = session.maNhanVien` (chỉ phiếu của chính mình), cột: STT, mã phiếu, tên BN, lý do khám, trạng thái (badge `CHO_KHAM` mờ / `DANG_KHAM` chọn được), giờ lập. Nút `btn_taiLai`. Click dòng → nạp toàn bộ khung khám bên phải.
 
-**BUS — `KhamBenh_BUS.danhSachKhamCuaToi(session)`:** quyền BAC_SI; đọc qua `PhieuKham_DAO.layDanhSachTheoBacSi(maBacSi, ngay)` (Thanh viết, Thắng dùng — cần rõ ràng chữ ký ngay M0).
+**BUS — `KhamBenh_BUS.danhSachKhamCuaToi(session)`:** quyền BAC_SI; đọc qua `PhieuKham_DAO.layDanhSachTheoBacSi(maBacSi, ngay)` (Huy viết, Thắng dùng — cần rõ ràng chữ ký ngay M0).
 
 **Quy tắc cốt lõi:** chỉ được **sửa** phiếu đang `DANG_KHAM` (Phụ tá đã xác nhận vào khám). Phiếu `CHO_KHAM` chỉ xem; phiếu `HOAN_TAT` chỉ đọc — mọi cố tình sửa → BUS ném **TB10**. Điều kiện UPDATE luôn kèm `AND trangThai = 'DANG_KHAM'` **và** `AND maNhanVien = session.maNhanVien` (chặn cả vai trò đúng nhưng sai phiếu).
 
 ### 3.2. BS-02 — Tiền sử & bệnh án điện tử
 
-**GUI:** panel trái — thông tin BN + `txt_tienSuDiUng` (readonly, từ `BenhNhan` của Thanh), `txt_tienSuBenhLy`, `txt_ghiChuChuyenMon` (từ `HoSoBenhAn`); nếu BN chưa có hồ sơ bệnh án → hiển thị "Chưa có hồ sơ bệnh án" và `KhamBenh_BUS` sẽ tự tạo khi lưu lần đầu (1 BN — 1 hồ sơ, `maBenhNhan` UNIQUE).
+**GUI:** panel trái — thông tin BN + `txt_tienSuDiUng` (readonly, từ `BenhNhan` của Huy), `txt_tienSuBenhLy`, `txt_ghiChuChuyenMon` (từ `HoSoBenhAn`); nếu BN chưa có hồ sơ bệnh án → hiển thị "Chưa có hồ sơ bệnh án" và `KhamBenh_BUS` sẽ tự tạo khi lưu lần đầu (1 BN — 1 hồ sơ, `maBenhNhan` UNIQUE).
 
 **BUS — `HoSoBenhAn_BUS`:** `layTheoBenhNhan(session, maBenhNhan)`; `taoHoSoNeuChuaCo(con, maBenhNhan, tienSuBenhLy)` — chạy trong transaction của `luuKham`, mã `HSyyMMddNNNN` qua `BoDem_DAO`; đã có → không tạo (DB UNIQUE chặn, bóc lỗi → **TB16** `Bệnh nhân này đã có hồ sơ bệnh án.`).
 
@@ -65,7 +65,7 @@ public void luuKham(SessionContext session, String maPhieuKham, String chanDoan,
 
 Transaction (1 commit/rollback, đúng thứ tự):
 1. `UPDATE PhieuKham SET chanDoan, ketQuaDieuTri, ghiChuThuocTuMua WHERE maPhieuKham=? AND trangThai='DANG_KHAM' AND maNhanVien=?` — 0 dòng → TB10.
-2. `HoSoBenhAn_BUS.taoHoSoNeuChuaCo(con, maBenhNhan, ...)` + gắn `maHoSo` vào phiếu (cột `maHoSo` nullable của Thanh).
+2. `HoSoBenhAn_BUS.taoHoSoNeuChuaCo(con, maBenhNhan, ...)` + gắn `maHoSo` vào phiếu (cột `maHoSo` nullable của Huy).
 3. Chỉ định: **xóa chỉ định cũ của phiếu rồi INSERT lại toàn bộ** trong cùng transaction (cách chốt để sửa chỉ định đơn giản, tránh UPDATE từng dòng) — mỗi dòng kiểm `DichVu.trangThai = DANG_PHUC_VU` tại thời điểm lưu, vi phạm → rollback + **TB15**; không có dòng nào mà GUI vẫn gửi → **TB06**.
 4. Cấp thuốc (BS-04 bên dưới) cùng transaction.
 
@@ -103,14 +103,14 @@ Transaction (1 commit/rollback, đúng thứ tự):
 ## 4. Thứ tự làm & phụ thuộc
 
 ```
-M0: chốt chữ ký PhieuKham_DAO với Thanh + schema 004/006/009/010 ──► BS-01 ──► BS-02 ──► BS-03 ──► BS-04 ──► BS-05
-BS-01 chờ Huy chuyển phiếu DANG_KHAM (M3 ghép) — trước đó tự tạo phiếu seed DANG_KHAM trong seed riêng của mình.
+M0: chốt chữ ký PhieuKham_DAO với Huy + schema 004/006/009/010 ──► BS-01 ──► BS-02 ──► BS-03 ──► BS-04 ──► BS-05
+BS-01 chờ Thanh chuyển phiếu DANG_KHAM (M3 ghép) — trước đó tự tạo phiếu seed DANG_KHAM trong seed riêng của mình.
 ```
 
 ## 5. Git workflow cá nhân
 
 - Issue prefix `BS-xx`; nhánh `feat/thang-bs-0x-<ten>`; commit `feat(uc004): luu kham va chi dinh dich vu...`.
-- **Reviewer của Thắng: Duy.** PR đụng `PhieuKham_DAO`/schema 007 mời thêm Thanh; đụng `DichVu` mời Duy.
+- **Reviewer của Thắng: Duy.** PR đụng `PhieuKham_DAO`/schema 007 mời thêm Huy; đụng `DichVu` mời Duy.
 
 ## 6. Mốc cá nhân
 
@@ -119,7 +119,7 @@ BS-01 chờ Huy chuyển phiếu DANG_KHAM (M3 ghép) — trước đó tự t�
 | M0 | Chốt chữ ký dùng chéo với Thanh/Duy/Huy; entity + schema 004/006/009/010 + seed thuốc |
 | M1 | `GD_KhamBenh` chạy FAKE (danh sách phiếu seed DANG_KHAM) |
 | M2 | luuKham + hoanTat chạy DB local, transaction thật + test-cases.md |
-| M3 | Ghép với Huy (vào khám) và Thanh (phiếu) chạy trơn |
+| M3 | Ghép với Thanh (vào khám) và Huy (phiếu) chạy trơn |
 | M4 | design.md/demo.md + sơ đồ sequence cập nhật khớp code cuối |
 
 ## 7. Chuẩn bị bảo vệ

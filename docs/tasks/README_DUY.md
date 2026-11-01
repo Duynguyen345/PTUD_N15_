@@ -1,6 +1,6 @@
 # NHIỆM VỤ CODE — NGUYỄN TUẤN DUY (24726131) — LUỒNG QUẢN LÝ + KHUNG ỨNG DỤNG
 
-> **Tóm tắt:** Duy sở hữu khung ứng dụng dùng chung (build, App, ConnectDB *chốt hợp đồng với Huy*, util, session, điều hướng) và luồng quản trị: đăng nhập/phân quyền (UC001) → quản lý nhân viên & tài khoản (UC010) → quản lý danh mục dịch vụ (UC007) → báo cáo lượt khám + xuất CSV (UC008).
+> **Tóm tắt:** Duy sở hữu khung ứng dụng dùng chung (build, App, ConnectDB *chốt hợp đồng với Thanh*, util, session, điều hướng) và luồng quản trị: đăng nhập/phân quyền (UC001) → quản lý nhân viên & tài khoản (UC010) → quản lý danh mục dịch vụ (UC007) → báo cáo lượt khám + xuất CSV (UC008).
 > **Bắt buộc đọc trước:** [README_RULES.md](../../README_RULES.md). Duy là người giữ `pom.xml` và các file dùng chung — chính Duy phải gương mẫu theo RULES trước.
 
 ---
@@ -27,12 +27,12 @@ Tổng 25. Backlog có chủ nhiệm (chốt M0): **QT-07 hàng hóa/tồn kho**
 | GUI khung | `gui/GD_Chinh_Controller.java` + `fxml/GD_Chinh.fxml`, `css/` nền | menu ẩn/hiện theo vai trò |
 | Model | `model/NhanVien.java`, `model/TaiKhoan.java`, `model/DichVu.java`, `model/ChucVu.java`, `model/TrangThaiTaiKhoan.java`, `model/TrangThaiDichVu.java` | |
 | DAO | `dao/TaiKhoan_DAO.java`, `dao/NhanVien_DAO.java`, `dao/DichVu_DAO.java`, `dao/BaoCao_DAO.java` | |
-| BUS | `bus/TaiKhoan_BUS.java`, `bus/NhanVien_BUS.java`, `bus/DichVu_BUS.java`, `bus/BaoCao_BUS.java` | `NhanVien_BUS`/`DichVu_BUS` là phụ thuộc của Thanh/Thắng — chốt chữ ký sớm |
+| BUS | `bus/TaiKhoan_BUS.java`, `bus/NhanVien_BUS.java`, `bus/DichVu_BUS.java`, `bus/BaoCao_BUS.java` | `NhanVien_BUS`/`DichVu_BUS` là phụ thuộc của Huy/Thắng — chốt chữ ký sớm |
 | GUI | cặp FXML+Controller: `GD_DangNhap`, `GD_QLNhanVien`, `GD_QLDichVu`, `GD_BaoCao` | |
 | SQL | `DATA/schema/002_nhanvien_taikhoan.sql`, `003_dichvu.sql` + seed | |
 | Minh chứng | `docs/evidence/duy/` | |
 
-**Hợp đồng với Huy (M0):** Duy chốt yêu cầu của `ConnectDB` (constructor đọc `db.properties`, `connect()`, `getConnection()` tự nối lại) — Huy viết code; Duy review API. Cấm tạo lớp kết nối thứ hai.
+**Hợp đồng với Thanh (M0):** Duy chốt yêu cầu của `ConnectDB` (constructor đọc `db.properties`, `connect()`, `getConnection()` tự nối lại) — Thanh viết code; Duy review API. Cấm tạo lớp kết nối thứ hai.
 
 ## 3. Chi tiết chức năng
 
@@ -71,11 +71,11 @@ Quy tắc: `trim()` cả hai; đối chiếu DB (`TaiKhoan_DAO.getTaiKhoanTheoTe
 
 **GUI:** `table_nhanVien` (mã, họ tên, SĐT, CCCD, chức vụ); `cbb_chucVu` (4 enum); các `txt_` tương tự màn bệnh nhân; `btn_them/sua/xoa/lamMoi`; phần tài khoản: `txt_tenDangNhap`, `cbb_trangThai`, `btn_taoTaiKhoan`, `btn_khoaMo`.
 
-**BUS — `NhanVien_BUS`:** `danhSachBacSiDangLamViec(session)` (dùng cho Thanh), `danhSachNhanVien(session)`, `themNhanVien(session, ...)` (quyền QUAN_LY; validate VL01/VL02/VL03; mã `NVyyMMddNNNN` qua `BoDem_DAO`), `suaNhanVien`, `xoaNhanVien` (đang có tài khoản/đã lập phiếu → **TB11**, chỉ ngừng làm việc), `taoTaiKhoan(session, maNhanVien, tenDangNhap, matKhau)` (trùng tên đăng nhập → **TB14**; mật khẩu hash), `khoaMoTaiKhoan`.
+**BUS — `NhanVien_BUS`:** `danhSachBacSiDangLamViec(session)` (dùng cho Huy), `danhSachNhanVien(session)`, `themNhanVien(session, ...)` (quyền QUAN_LY; validate VL01/VL02/VL03; mã `NVyyMMddNNNN` qua `BoDem_DAO`), `suaNhanVien`, `xoaNhanVien` (đang có tài khoản/đã lập phiếu → **TB11**, chỉ ngừng làm việc), `taoTaiKhoan(session, maNhanVien, tenDangNhap, matKhau)` (trùng tên đăng nhập → **TB14**; mật khẩu hash), `khoaMoTaiKhoan`.
 
 **DAO:** `NhanVien_DAO` (them/sua/xoa/getAll/layTheoMa/layDanhSachBacSiHoatDong), `TaiKhoan_DAO` (them/capNhat/layTheoMaNV/kiemTraTenDangNhapTonTai).
 
-**Test case:** thêm NV 4 chức vụ (TC-QT03-01); SĐT/CCCD sai → VL02/VL03 (02,03); tạo TK trùng → TB14 (04); khóa TK bác sĩ → Thanh lập phiếu cho bác sĩ đó báo TB03 (05); xóa NV đang gắn TK → TB11 (06).
+**Test case:** thêm NV 4 chức vụ (TC-QT03-01); SĐT/CCCD sai → VL02/VL03 (02,03); tạo TK trùng → TB14 (04); khóa TK bác sĩ → Huy lập phiếu cho bác sĩ đó báo TB03 (05); xóa NV đang gắn TK → TB11 (06).
 
 ### 3.3. QT-04 — UC007: Quản lý danh mục dịch vụ (`GD_QLDichVu`)
 
@@ -83,7 +83,7 @@ Quy tắc: `trim()` cả hai; đối chiếu DB (`TaiKhoan_DAO.getTaiKhoanTheoTe
 
 **GUI:** `table_dichVu` (mã, tên, đơn giá `#,##0 ₫`, trạng thái); `txt_tenDichVu`, `txt_donGia`, `cbb_trangThai` (`DANG_PHUC_VU`/`NGUNG_PHUC_VU`); `btn_them/sua/lamMoi`. Không có nút Xóa cứng — dịch vụ hết dùng chỉ chuyển `NGUNG_PHUC_VU`.
 
-**BUS — `DichVu_BUS`:** `danhSachDichVuDangPhucVu(session)` (dùng cho Thắng), `layDichVuTheoMa` (dùng cho Thanh — `DV0001` phí khám), `themDichVu` (trùng tên → **TB12**; VL06), `suaDichVu` (đổi giá chỉ ảnh hưởng sau này — chi tiết hóa đơn giữ snapshot), `doiTrangThai`. Quyền QUAN_LY.
+**BUS — `DichVu_BUS`:** `danhSachDichVuDangPhucVu(session)` (dùng cho Thắng), `layDichVuTheoMa` (dùng cho Huy — `DV0001` phí khám), `themDichVu` (trùng tên → **TB12**; VL06), `suaDichVu` (đổi giá chỉ ảnh hưởng sau này — chi tiết hóa đơn giữ snapshot), `doiTrangThai`. Quyền QUAN_LY.
 
 **SQL:** `003_dichvu.sql` — `DichVu(maDichVu PK DVNNNN, tenDichVu UNIQUE, donGiaNiemYet decimal(18,2) CHECK >=0, trangThai)`; seed ≥ 8 dịch vụ nha khoa + `DV0001 Phí khám ban đầu` + 2 dịch vụ `NGUNG_PHUC_VU` để test.
 
@@ -119,7 +119,7 @@ Cả nhóm chờ QT-01 + chữ ký `NhanVien_BUS.danhSachBacSiDangLamViec` và `
 
 | Mốc | Duy phải có |
 | --- | --- |
-| M0 | `pom.xml` + khung chạy được trên 4 máy; ConnectDB API chốt với Huy; chữ ký BUS chia sẻ; schema 002/003 + seed |
+| M0 | `pom.xml` + khung chạy được trên 4 máy; ConnectDB API chốt với Thanh; chữ ký BUS chia sẻ; schema 002/003 + seed |
 | M1 | 5 màn hình (Đăng nhập/Chính/NV/DV/Báo cáo) chạy FAKE |
 | M2 | Đủ 4 chức năng với DB local + hash mật khẩu + CSV đúng chuẩn |
 | M3 | Đăng nhập phân quyền thật phục vụ demo cả nhóm |

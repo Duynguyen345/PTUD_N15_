@@ -11,10 +11,10 @@ Trường Đại học Công nghiệp TP. Hồ Chí Minh (IUH) — Khoa Công ng
 
 | STT | Họ tên | MSSV | Vai trò nhóm | Luồng phụ trách | Tài liệu nhiệm vụ |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Phan Chí Thanh | 24738801 | Facilitator | **Lễ tân**: hồ sơ bệnh nhân, thu phí, lập phiếu khám, tra cứu | [README_THANH.md](docs/tasks/README_THANH.md) |
+| 1 | Phan Chí Thanh | 24738801 | Facilitator | **Phụ tá + hạ tầng CSDL**: hàng chờ/gọi số, xác nhận vào khám + ConnectDB/BoDem/schema dùng chung | [README_THANH.md](docs/tasks/README_THANH.md) |
 | 2 | Nguyễn Tuấn Duy | 24726131 | Reporter | **Quản lý**: đăng nhập/phân quyền, nhân viên, dịch vụ, báo cáo + khung ứng dụng | [README_DUY.md](docs/tasks/README_DUY.md) |
 | 3 | Huỳnh Quốc Thắng | 22693891 | Recorder | **Bác sĩ**: khám & chẩn đoán, chỉ định dịch vụ, cấp thuốc, hoàn tất | [README_THANG.md](docs/tasks/README_THANG.md) |
-| 4 | Hoàng Đình Huy | 22669751 | Time Keeper | **Phụ tá**: hàng chờ/gọi số + hạ tầng CSDL & kết nối dùng chung | [README_HUY.md](docs/tasks/README_HUY.md) |
+| 4 | Hoàng Đình Huy | 22669751 | Time Keeper | **Lễ tân**: hồ sơ bệnh nhân, thu phí, lập phiếu khám, tra cứu | [README_HUY.md](docs/tasks/README_HUY.md) |
 
 ---
 
@@ -33,14 +33,14 @@ Việc đặt lịch hẹn qua điện thoại/quét QR và tích hợp AI **kh�
 | Mã | Tên use case | Tác nhân | Người hiện thực |
 | --- | --- | --- | --- |
 | UC001 | Đăng nhập hệ thống | Cả 4 tác nhân | Duy |
-| UC002 | Quản lý hồ sơ bệnh nhân | Lễ tân | Thanh |
-| UC003 | Tiếp nhận bệnh nhân — lập phiếu khám bệnh | Lễ tân | Thanh |
+| UC002 | Quản lý hồ sơ bệnh nhân | Lễ tân | Huy |
+| UC003 | Tiếp nhận bệnh nhân — lập phiếu khám bệnh | Lễ tân | Huy |
 | UC004 | Ghi nhận khám và chẩn đoán | Bác sĩ | Thắng |
-| UC005 | Thu tiền phí khám | Lễ tân | Thanh |
-| UC006 | Tra cứu hồ sơ bệnh nhân | Lễ tân | Thanh |
+| UC005 | Thu tiền phí khám | Lễ tân | Huy |
+| UC006 | Tra cứu hồ sơ bệnh nhân | Lễ tân | Huy |
 | UC007 | Quản lý danh mục dịch vụ | Quản lý | Duy |
 | UC008 | Xem báo cáo lượt khám (kèm xuất CSV, không có doanh thu) | Quản lý | Duy |
-| UC009 | Theo dõi hàng chờ (gọi số, xác nhận vào khám) | Phụ tá | Huy |
+| UC009 | Theo dõi hàng chờ (gọi số, xác nhận vào khám) | Phụ tá | Thanh |
 | UC010 | Quản lý nhân viên & tài khoản (nêu trong bảng tác nhân, đặc tả do nhóm chốt tối thiểu) | Quản lý | Duy |
 
 ### 2.2. Luồng nghiệp vụ lõi (trạng thái phiếu khám)
@@ -49,7 +49,7 @@ Việc đặt lịch hẹn qua điện thoại/quét QR và tích hợp AI **kh�
 CHO_KHAM ──(Phụ tá gọi số + xác nhận vào khám)──► DANG_KHAM ──(Bác sĩ hoàn tất)──► HOAN_TAT
 ```
 
-- Thanh tạo phiếu với trạng thái `CHO_KHAM`; **chỉ** Huy chuyển sang `DANG_KHAM`; **chỉ** Thắng chuyển sang `HOAN_TAT` (đã kiểm tra chẩn đoán/kết quả dịch vụ).
+- Huy tạo phiếu với trạng thái `CHO_KHAM`; **chỉ** Thanh chuyển sang `DANG_KHAM`; **chỉ** Thắng chuyển sang `HOAN_TAT` (đã kiểm tra chẩn đoán/kết quả dịch vụ).
 - Thanh toán không làm đổi trạng thái khám. Không chuyển ngược trạng thái.
 - Chi tiết chuyển trạng thái và ràng buộc UPDATE: xem [README_RULES.md](README_RULES.md).
 
@@ -116,7 +116,7 @@ PTUD_N15_/                          ← project Maven "dentist-clinic"
 │   └── …tài liệu thiết kế
 ├── src/main/java/vn/nhom15/nhakhoa/
 │   ├── App.java                    ← entry point + điều hướng + session (Duy)
-│   ├── connect/ConnectDB.java      ← singleton kết nối (Huy)
+│   ├── connect/ConnectDB.java      ← singleton kết nối (Thanh)
 │   ├── model/                      ← 16 entity + enum đã có + SessionContext
 │   ├── dao/                        ← Xxx_DAO + BoDem_DAO (cấp mã tự động)
 │   ├── bus/                        ← Xxx_BUS
@@ -136,11 +136,11 @@ PTUD_N15_/                          ← project Maven "dentist-clinic"
 | --- | --- | --- | --- |
 | `GD_DangNhap.fxml` | `GD_DangNhap_Controller` | UC001 | Duy |
 | `GD_Chinh.fxml` | `GD_Chinh_Controller` | khung menu theo vai trò | Duy |
-| `GD_QLBenhNhan.fxml` | `GD_QLBenhNhan_Controller` | UC002 | Thanh |
-| `GD_TraCuuBenhNhan.fxml` | `GD_TraCuuBenhNhan_Controller` | UC006 | Thanh |
-| `GD_ThuPhi.fxml` | `GD_ThuPhi_Controller` | UC005 | Thanh |
-| `GD_LapPhieuKham.fxml` | `GD_LapPhieuKham_Controller` | UC003 | Thanh |
-| `GD_HangCho.fxml` | `GD_HangCho_Controller` | UC009 | Huy |
+| `GD_QLBenhNhan.fxml` | `GD_QLBenhNhan_Controller` | UC002 | Huy |
+| `GD_TraCuuBenhNhan.fxml` | `GD_TraCuuBenhNhan_Controller` | UC006 | Huy |
+| `GD_ThuPhi.fxml` | `GD_ThuPhi_Controller` | UC005 | Huy |
+| `GD_LapPhieuKham.fxml` | `GD_LapPhieuKham_Controller` | UC003 | Huy |
+| `GD_HangCho.fxml` | `GD_HangCho_Controller` | UC009 | Thanh |
 | `GD_KhamBenh.fxml` | `GD_KhamBenh_Controller` | UC004 | Thắng |
 | `GD_QLNhanVien.fxml` | `GD_QLNhanVien_Controller` | UC010 | Duy |
 | `GD_QLDichVu.fxml` | `GD_QLDichVu_Controller` | UC007 | Duy |
@@ -148,14 +148,14 @@ PTUD_N15_/                          ← project Maven "dentist-clinic"
 
 ## 5. Cơ sở dữ liệu (theo báo cáo Chương 4 — 12 bảng)
 
-`NhanVien`, `TaiKhoan`, `PhongKham`, `BenhNhan`, `HoSoBenhAn`, `DichVu`, `Thuoc`, `PhieuKham`, `HoaDon`, `ChiTietHoaDon`, `ChiDinhDichVu`, `ChiTietCapThuoc` — cộng bảng hạ tầng `BoDem` (bộ đếm mã) do Huy chủ trì.
+`NhanVien`, `TaiKhoan`, `PhongKham`, `BenhNhan`, `HoSoBenhAn`, `DichVu`, `Thuoc`, `PhieuKham`, `HoaDon`, `ChiTietHoaDon`, `ChiDinhDichVu`, `ChiTietCapThuoc` — cộng bảng hạ tầng `BoDem` (bộ đếm mã) do Thanh chủ trì.
 
 Quy ước chính (chi tiết đầy đủ trong [README_RULES.md](README_RULES.md)):
 
 - Mã tự động theo ngày, cấp nguyên tử qua bảng `BoDem` trong transaction: `NVyyMMddNNNN`, `BNyyMMddNNNN`, `HSyyMMddNNNN`, `PKyyMMddNNNN`, `HDyyMMddNNNN`, `DVNNNN`, `THNNNN`, `PNNN`.
 - `PhieuKham.soThuTu`: UNIQUE theo cặp `(ngayKham, maPhong)` — không trùng STT cùng phòng cùng ngày.
 - Tiền: `decimal(18,2)` ↔ `BigDecimal`; chuỗi tiếng Việt: `nvarchar`; trạng thái: `nvarchar` lưu đúng tên enum (`CHO_KHAM`, `HOAT_DONG`, `DANG_PHUC_VU`…).
-- Script SQL đặt tại `DATA/schema/` (tạo cấu trúc) và `DATA/seed/` (dữ liệu mẫu), đánh số theo thứ tự phụ thuộc — ai tạo bảng tự viết script bảng mình, Huy kiểm duyệt thứ tự chạy.
+- Script SQL đặt tại `DATA/schema/` (tạo cấu trúc) và `DATA/seed/` (dữ liệu mẫu), đánh số theo thứ tự phụ thuộc — ai tạo bảng tự viết script bảng mình, Thanh kiểm duyệt thứ tự chạy.
 
 ## 6. Hướng dẫn cài đặt & chạy (làm đúng thứ tự)
 
@@ -171,7 +171,7 @@ Quy ước chính (chi tiết đầy đủ trong [README_RULES.md](README_RULES.
 
 ## 7. Quy trình làm việc nhóm (Git/GitHub)
 
-- Nhánh ổn định: `master`. Nhánh làm việc cá nhân: `feat/<ban>-<mã>-<tên>` ví dụ `feat/thanh-lt-02-thu-phi`. Nhánh tổng hợp tài liệu: `prj15/main`.
+- Nhánh ổn định: `master`. Nhánh làm việc cá nhân: `feat/<ban>-<mã>-<tên>` ví dụ `feat/huy-lt-02-thu-phi`. Nhánh tổng hợp tài liệu: `prj15/main`.
 - Mỗi chức năng = 1 Issue (prefix `LT-`/`QT-`/`BS-`/`PT-` theo thành viên) = 1 PR. Commit theo conventional: `feat(uc003): lap phieu kham va cap so thu tu`.
 - Review xoay vòng bắt buộc trước merge: **Thanh review Duy → Duy review Thắng → Thắng review Huy → Huy review Thanh**. PR đụng file dùng chung phải thêm chủ file vào review.
 - Board: `Backlog → Ready → In progress → Review → Done`; Done chỉ sau khi PR merge và chạy được với DB.
@@ -192,8 +192,8 @@ Quy ước chính (chi tiết đầy đủ trong [README_RULES.md](README_RULES.
 Luồng demo chuẩn sau đăng nhập (mỗi người trình bày chặng của mình):
 
 1. **Duy** — giới thiệu hệ thống, đăng nhập phân quyền, mở khung ứng dụng theo vai trò.
-2. **Thanh** — tìm/tạo hồ sơ bệnh nhân → thu phí khám → lập phiếu, cấp STT, in phiếu.
-3. **Huy** — theo dõi hàng chờ theo phòng → gọi số → cập nhật bảng số → xác nhận vào khám.
+2. **Huy** — tìm/tạo hồ sơ bệnh nhân → thu phí khám → lập phiếu, cấp STT, in phiếu.
+3. **Thanh** — theo dõi hàng chờ theo phòng → gọi số → cập nhật bảng số → xác nhận vào khám.
 4. **Thắng** — nhận danh sách khám → xem tiền sử → ghi chẩn đoán, chỉ định dịch vụ, cấp thuốc → hoàn tất.
 5. **Duy** — quản lý nhân viên/dịch vụ → xem báo cáo lượt khám → xuất CSV.
 

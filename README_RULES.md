@@ -41,7 +41,7 @@ util/: hàm format, validate, phân quyền, alert dùng chung
 
 ### 2.1. Pattern chuẩn bắt chước từ N11 (viết y hệt kiểu này)
 
-**ConnectDB (singleton, do Huy chủ trì — người khác chỉ dùng):**
+**ConnectDB (singleton, do Thanh chủ trì — người khác chỉ dùng):**
 
 ```java
 public class ConnectDB {
@@ -182,7 +182,7 @@ Quy ước chuỗi: **mọi input `trim()` trước khi dùng**; rỗng → chu�
 
 ### 4.5. Chuyển trạng thái phiếu khám — luồng lõi không được phá vỡ
 
-- `CHO_KHAM`: chỉ Thanh tạo (khi lập phiếu). `DANG_KHAM`: chỉ Huy chuyển (gọi số + xác nhận vào khám). `HOAN_TAT`: chỉ Thắng chuyển (đã có chẩn đoán; nếu có dịch vụ chỉ định thì phải lưu xong chi tiết).
+- `CHO_KHAM`: chỉ Huy tạo (khi lập phiếu). `DANG_KHAM`: chỉ Thanh chuyển (gọi số + xác nhận vào khám). `HOAN_TAT`: chỉ Thắng chuyển (đã có chẩn đoán; nếu có dịch vụ chỉ định thì phải lưu xong chi tiết).
 - **UPDATE trạng thái luôn kèm điều kiện trạng thái cũ** và kiểm tra số dòng ảnh hưởng:
 
 ```java
@@ -199,13 +199,13 @@ int n = pstm.executeUpdate();           // n == 0 → người khác đã đổi
 1. Mọi mã sinh theo ngày qua **bảng `BoDem(loaiMa, ngay, giaTri)`** — cấp mã trong transaction bằng `UPDATE ... SET giaTri = giaTri + 1 OUTPUT` (khóa dòng, nguyên tử). Cấm `SELECT MAX(ma)+1`, cấm `COUNT+1` — hai máy chạy cùng lúc sẽ trùng mã.
 2. Format mã (báo cáo Chương 4): `NVyyMMddNNNN`, `BNyyMMddNNNN`, `HSyyMMddNNNN`, `PKyyMMddNNNN`, `HDyyMMddNNNN`, `DVNNNN`, `THNNNN`, `PNNN`. Hết dải 9999 → ném lỗi TB09 kèm mô tả.
 3. `PhieuKham.soThuTu`: đếm riêng theo `(ngayKham, maPhong)`, ràng buộc `UNIQUE` trong DB; reset tự nhiên theo ngày. BUS cấp STT trong cùng transaction với INSERT phiếu.
-4. Hàm duy nhất được gọi: `BoDem_DAO.layMaMoi(...)` / `BoDem_DAO.laySoThuTuTiepTheo(...)` (Huy chủ trì) — cấm viết bộ sinh mã riêng.
+4. Hàm duy nhất được gọi: `BoDem_DAO.layMaMoi(...)` / `BoDem_DAO.laySoThuTuTiepTheo(...)` (Thanh chủ trì) — cấm viết bộ sinh mã riêng.
 
 ---
 
 ## 6. Quy tắc SQL Server & script trong `DATA/`
 
-- `DATA/schema/`: `000_hatang.sql` (CREATE DATABASE `N15_PTUD_DB`, collation, bảng `BoDem`) → `001_phongkham.sql` (Huy) → `002_nhanvien_taikhoan.sql` (Duy) → `003_dichvu.sql` (Duy) → `004_thuoc.sql` (Thắng) → `005_benhnhan.sql` (Thanh) → `006_hosobenhan.sql` (Thắng) → `007_phieukham.sql` (Thanh) → `008_hoadon_chitiethoadon.sql` (Thanh) → `009_chidinhdichvu.sql` (Thắng) → `010_chitietcapthuoc.sql` (Thắng). `011_banggoiso.sql` (Huy — chốt ở M0 nếu cần lưu "số đang gọi").
+- `DATA/schema/`: `000_hatang.sql` (CREATE DATABASE `N15_PTUD_DB`, collation, bảng `BoDem`) → `001_phongkham.sql` (Thanh) → `002_nhanvien_taikhoan.sql` (Duy) → `003_dichvu.sql` (Duy) → `004_thuoc.sql` (Thắng) → `005_benhnhan.sql` (Huy) → `006_hosobenhan.sql` (Thắng) → `007_phieukham.sql` (Huy) → `008_hoadon_chitiethoadon.sql` (Huy) → `009_chidinhdichvu.sql` (Thắng) → `010_chitietcapthuoc.sql` (Thắng). `011_banggoiso.sql` (Thanh — chốt ở M0 nếu cần lưu "số đang gọi").
 - `DATA/seed/`: cùng số với schema (`002_seed_nhanvien_taikhoan.sql`…). Seed đủ FK, ≥10 bệnh nhân, ≥3 bác sĩ, ≥8 dịch vụ, dữ liệu trải 2 tuần để demo báo cáo.
 - Chuỗi tiếng Việt trong DB: `nvarchar` (hoặc `varchar` + collation hỗ trợ Unicode — theo file 000); ngày `date`; thời điểm `datetime2(0)`; tiền `decimal(18,2)`; đúng/sai `bit`.
 - Ràng buộc: PK + FK đầy đủ; `CHECK` cho giá > 0, số lượng > 0, STT > 0; `UNIQUE(soDienThoai)` cho `TaiKhoan`… theo đặc tả báo cáo; `UNIQUE(cccd)` cho phép NULL.
@@ -287,17 +287,17 @@ GUI hiển thị đúng chuỗi dưới đây; chuỗi nằm trong `util/MaThong
 | Hạng mục | Chốt |
 | --- | --- |
 | Nhánh ổn định | `master` — cấm push trực tiếp |
-| Nhánh chức năng | `feat/<ban>-<mã>-<tên>` ví dụ `feat/thanh-lt-02-thu-phi` |
+| Nhánh chức năng | `feat/<ban>-<mã>-<tên>` ví dụ `feat/huy-lt-02-thu-phi` |
 | Nhánh tài liệu | `prj15/main` |
 | Commit | conventional không dấu: `feat(uc003): lap phieu kham va cap stt`, `fix(uc005): sua truong hop thu phi trung`, `docs(rules): ...` |
-| Issue | 1 chức năng = 1 Issue, prefix `LT-`/`QT-`/`BS-`/`PT-` + số, gán đúng chủ nhiệm |
+| Issue | 1 chức năng = 1 Issue, prefix `LT-`/`QT-`/`BS-`/`PT-` + số, gán đúng chủ nhiệm — prefix theo luồng chức năng (LT=lễ tân, QT=quản trị, BS=bác sĩ, PT=phụ tá) |
 | PR | 1 chức năng = 1 PR; tiêu đề `[LT-02] Thu phí khám`; mô tả: làm gì, cách test, ảnh chụp |
 | Review xoay vòng | Thanh → Duy → Thắng → Huy → Thanh; PR đụng file dùng chung thêm chủ file review |
 | Merge | merge commit (giữ lịch sử + tác giả); xóa nhánh sau merge |
 | Cấm | force push; commit file người khác; commit `db.properties` thật, `bin/`, `.class`, jar, dữ liệu thật; nhờ đứng tên commit hộ |
 | Git config | email = email GitHub thật để ghi nhận contribution |
 
-**Quyền sở hữu file (quy tắc "một lớp một chủ"):** mỗi file có đúng một chủ (bảng trong từng README nhiệm vụ); người khác được **dùng lại** nhưng không được sửa; cần thêm chữ ký hàm → PR đề xuất cho chủ file. Entity dùng chéo (ví dụ `PhieuKham` do Thanh chủ, Thắng/Huy dùng) chỉ đọc/ghi qua DAO của chủ.
+**Quyền sở hữu file (quy tắc "một lớp một chủ"):** mỗi file có đúng một chủ (bảng trong từng README nhiệm vụ); người khác được **dùng lại** nhưng không được sửa; cần thêm chữ ký hàm → PR đề xuất cho chủ file. Entity dùng chéo (ví dụ `PhieuKham` do Huy chủ, Thắng/Thanh dùng) chỉ đọc/ghi qua DAO của chủ.
 
 ---
 
