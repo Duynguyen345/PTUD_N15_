@@ -1,0 +1,29 @@
+.root {
+    -fx-font-family: "Segoe UI";
+}
+
+.header {
+    -fx-background-color: #1F618D;
+    -fx-padding: 10 16 10 16;
+}
+
+.header .label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.menu-pane {
+    -fx-background-color: #D6EAF8;
+    -fx-padding: 12;
+    -fx-spacing: 8;
+}
+
+.menu-pane .button {
+    -fx-max-width: Infinity;
+    -fx-alignment: baseline-left;
+}
+
+.center-pane {
+    -fx-padding: 16;
+}
