@@ -1,0 +1,125 @@
+/* ============================================================
+   CHE DO TOI — ghi de len ungdung.css khi root co class "dark"
+   (bat/tat bang nut "Che do toi" o sidebar)
+   ============================================================ */
+
+.dark {
+    -fx-background-color: #10192B;
+}
+.dark .label { -fx-text-fill: #E6E8EB; }
+
+/* Header + tieu de */
+.dark .header {
+    -fx-background-color: #16233B;
+    -fx-border-color: #2A3B5C;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0.1, 0, 1);
+}
+.dark .page-title { -fx-text-fill: #EAF2FB; }
+.dark .label.header {
+    -fx-background-color: #16233B;
+    -fx-text-fill: #EAF2FB;
+    -fx-border-color: #2A3B5C;
+}
+.dark .chip-name { -fx-text-fill: #EAF2FB; }
+.dark .chip-role { -fx-text-fill: #9FB2CC; }
+.dark .avatar { -fx-background-color: #2F6DA3; -fx-text-fill: white; }
+
+/* Sidebar (sang hon nen de phan biet) */
+.dark .sidebar {
+    -fx-background-color: linear-gradient(180deg, #0E2338 0%, #14304E 100%);
+    -fx-border-color: #2A3B5C;
+}
+.dark .brand-name { -fx-text-fill: white; }
+.dark .brand-sub { -fx-text-fill: #8FB4D9; }
+.dark .menu-caption { -fx-text-fill: #7A97B8; }
+.dark .menu-btn { -fx-text-fill: #C7D9EC; }
+.dark .menu-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-text-fill: white;
+}
+.dark .menu-btn.active {
+    -fx-background-color: linear-gradient(to right, #2F6DA3, #1D4E76);
+    -fx-text-fill: white;
+}
+.dark .logout-btn {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-text-fill: #C7D9EC;
+    -fx-border-color: rgba(255,255,255,0.25);
+}
+.dark .logout-btn:hover { -fx-background-color: rgba(231,76,60,0.3); -fx-text-fill: #FFD9D4; }
+
+/* Vung noi dung + card */
+.dark .center-pane {
+    -fx-background-color: linear-gradient(to bottom, #10192B, #16233B);
+}
+.dark .card {
+    -fx-background-color: #182542;
+    -fx-border-color: #2A3B5C;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 12, 0.1, 0, 3);
+}
+.dark .card-title { -fx-text-fill: #EAF2FB; }
+.dark .section-title { -fx-text-fill: #EAF2FB; }
+.dark .big-date { -fx-text-fill: #7FC5F5; }
+.dark .stat-value { -fx-text-fill: #7FC5F5; }
+.dark .stat-label { -fx-text-fill: #9FB2CC; }
+.dark .hint-text { -fx-text-fill: #9FB2CC; }
+.dark .info-banner { -fx-background-color: #332B12; -fx-text-fill: #F0D98C; }
+
+/* Input */
+.dark .text-field, .dark .text-area, .dark .password-field {
+    -fx-background-color: #16233B;
+    -fx-text-fill: #E6E8EB;
+    -fx-border-color: #2A3B5C;
+    -fx-prompt-text-fill: #7A8CA3;
+}
+.dark .text-field:focused, .dark .text-area:focused, .dark .password-field:focused {
+    -fx-border-color: #4C8FC7;
+}
+.dark .combo-box, .dark .date-picker { -fx-background-color: #16233B; -fx-border-color: #2A3B5C; }
+.dark .combo-box .list-cell { -fx-text-fill: #E6E8EB; -fx-background-color: #16233B; }
+.dark .combo-box .arrow { -fx-background-color: #9FB2CC; }
+.dark .input-group {
+    -fx-background-color: #16233B;
+    -fx-border-color: #2A3B5C;
+}
+.dark .input-group .text-field, .dark .input-group .password-field { -fx-text-fill: #E6E8EB; }
+
+/* Nut */
+.dark .button {
+    -fx-background-color: #1D3252;
+    -fx-text-fill: #EAF2FB;
+    -fx-border-color: #2A3B5C;
+}
+.dark .button:hover { -fx-background-color: #24406B; }
+.dark .btn-primary, .dark .button:default {
+    -fx-background-color: linear-gradient(to bottom, #2F6DA3, #1D4E76);
+    -fx-text-fill: white;
+    -fx-border-color: #2F6DA3;
+}
+.dark .btn-primary:hover, .dark .button:default:hover { -fx-background-color: #245A8C; }
+
+/* Bang */
+.dark .table-view {
+    -fx-background-color: #182542;
+    -fx-border-color: #2A3B5C;
+}
+.dark .table-view .column-header-background { -fx-background-color: #1D5C8F; }
+.dark .table-view .column-header .label { -fx-text-fill: white; }
+.dark .table-row-cell { -fx-background-color: #182542; }
+.dark .table-row-cell:odd { -fx-background-color: #1C2C4A; }
+.dark .table-row-cell:hover { -fx-background-color: #24355A; }
+.dark .table-row-cell:selected { -fx-background-color: #2F6DA3; }
+.dark .table-row-cell:selected .table-cell { -fx-text-fill: white; }
+.dark .table-view .placeholder .label { -fx-text-fill: #7A8CA3; }
+
+/* Login (neu bat toi truoc khi dang nhap xong) */
+.dark .login-card { -fx-background-color: #182542; }
+.dark .login-title { -fx-text-fill: #EAF2FB; }
+.dark .login-sub { -fx-text-fill: #9FB2CC; }
+.dark .login-left {
+    -fx-background-color: #123A5F;
+    -fx-background-image: url("@../pic/login_brand.png");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
