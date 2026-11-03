@@ -3,22 +3,40 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="vn.nhom15.nhakhoa.gui.GD_DangNhap_Controller"
-            style="-fx-background-color: #EAF2F8;">
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+           fx:controller="vn.nhom15.nhakhoa.gui.GD_DangNhap_Controller"
+           styleClass="login-root" prefWidth="1000" prefHeight="620"
+           stylesheets="@../css/ungdung.css">
     <children>
-        <VBox alignment="CENTER" spacing="12" prefWidth="320"
-              layoutX="240" layoutY="100" AnchorPane.topAnchor="100.0">
-            <Label text="PHÒNG KHÁM NHA KHOA SÀI GÒN"
-                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1F618D;"/>
-            <Label text="Đăng nhập hệ thống (UC001)" style="-fx-font-size: 14px;"/>
-            <TextField fx:id="txt_taiKhoan" promptText="Tên đăng nhập"/>
-            <PasswordField fx:id="txt_matKhau" promptText="Mật khẩu"/>
-            <Button fx:id="btn_dangNhap" text="Đăng nhập" onAction="#dangNhap"
-                    maxWidth="Infinity" defaultButton="true"/>
-            <Label fx:id="lb_thongBao" style="-fx-text-fill: red;" wrapText="true"/>
-        </VBox>
+        <HBox>
+            <VBox styleClass="login-left" prefWidth="440" HBox.hgrow="ALWAYS"/>
+            <VBox styleClass="login-card" HBox.hgrow="ALWAYS">
+                <Label text="Chào mừng bạn trở lại" styleClass="login-title"/>
+                <Label text="Đăng nhập để tiếp tục sử dụng hệ thống" styleClass="login-sub"/>
+                <Region prefHeight="10"/>
+                <HBox styleClass="input-group" maxWidth="360">
+                    <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
+                        <image><Image url="@../pic/icon_user.png"/></image>
+                    </ImageView>
+                    <TextField fx:id="txt_taiKhoan" promptText="Nhập tên đăng nhập" HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <HBox styleClass="input-group" maxWidth="360">
+                    <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
+                        <image><Image url="@../pic/icon_lock.png"/></image>
+                    </ImageView>
+                    <PasswordField fx:id="txt_matKhau" promptText="Nhập mật khẩu" HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <Region prefHeight="6"/>
+                <Button fx:id="btn_dangNhap" text="Đăng nhập" onAction="#dangNhap"
+                        maxWidth="360" prefHeight="42" defaultButton="true" styleClass="btn-primary"/>
+                <Label fx:id="lb_thongBao" style="-fx-text-fill: #C0392B;" wrapText="true" maxWidth="360"/>
+            </VBox>
+        </HBox>
     </children>
-</AnchorPane>
+</StackPane>

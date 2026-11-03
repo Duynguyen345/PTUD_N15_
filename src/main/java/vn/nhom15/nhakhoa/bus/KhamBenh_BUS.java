@@ -10,6 +10,7 @@ import vn.nhom15.nhakhoa.dao.ChiDinhDichVu_DAO;
 import vn.nhom15.nhakhoa.dao.ChiTietCapThuoc_DAO;
 import vn.nhom15.nhakhoa.dao.DichVu_DAO;
 import vn.nhom15.nhakhoa.dao.PhieuKham_DAO;
+import vn.nhom15.nhakhoa.dao.Thuoc_DAO;
 import vn.nhom15.nhakhoa.model.ChiDinhDichVu;
 import vn.nhom15.nhakhoa.model.ChiTietCapThuoc;
 import vn.nhom15.nhakhoa.model.ChucVu;
@@ -18,6 +19,7 @@ import vn.nhom15.nhakhoa.model.PhieuKham;
 import vn.nhom15.nhakhoa.model.SessionContext;
 import vn.nhom15.nhakhoa.model.TrangThaiDichVu;
 import vn.nhom15.nhakhoa.model.TrangThaiPhieuKham;
+import vn.nhom15.nhakhoa.model.Thuoc;
 import vn.nhom15.nhakhoa.util.MaThongBao;
 import vn.nhom15.nhakhoa.util.QuyenUtil;
 import vn.nhom15.nhakhoa.util.ValidateUtil;
@@ -28,6 +30,29 @@ public class KhamBenh_BUS {
     public static List<PhieuKham> danhSachKhamCuaToi(SessionContext session) {
         QuyenUtil.kiemTraQuyen(session, ChucVu.BAC_SI);
         return PhieuKham_DAO.layDanhSachTheoBacSi(session.getMaNhanVien(), LocalDate.now());
+    }
+
+    public static List<Thuoc> danhSachThuoc(SessionContext session) {
+        QuyenUtil.kiemTraQuyen(session, ChucVu.BAC_SI);
+        return Thuoc_DAO.getAllThuoc();
+    }
+
+    public static List<ChiDinhDichVu> layChiDinhCuaToi(SessionContext session, String maPhieuKham) {
+        kiemTraPhieuCuaToi(session, maPhieuKham);
+        return ChiDinhDichVu_DAO.layTheoPhieu(maPhieuKham);
+    }
+
+    public static List<ChiTietCapThuoc> layThuocCapCuaToi(SessionContext session, String maPhieuKham) {
+        kiemTraPhieuCuaToi(session, maPhieuKham);
+        return ChiTietCapThuoc_DAO.layTheoPhieu(maPhieuKham);
+    }
+
+    private static void kiemTraPhieuCuaToi(SessionContext session, String maPhieuKham) {
+        QuyenUtil.kiemTraQuyen(session, ChucVu.BAC_SI);
+        PhieuKham pk = PhieuKham_DAO.layPhieuKhamTheoMa(maPhieuKham);
+        if (pk == null || !session.getMaNhanVien().equals(pk.getMaNhanVien())) {
+            throw new SecurityException(MaThongBao.TB08);
+        }
     }
 
     /** UC004 - luu kham: UPDATE phieu (dieu kien DANG_KHAM + chu phieu) + ho so + chi dinh + thuoc, 1 transaction. */
