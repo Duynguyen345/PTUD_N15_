@@ -1,6 +1,6 @@
 # NHIỆM VỤ CODE — HOÀNG ĐÌNH HUY (22669751) — LUỒNG LỄ TÂN
 
-> **Tóm tắt:** Huy sở hữu toàn bộ luồng tiếp nhận bên lễ tân: quản lý hồ sơ bệnh nhân (UC002) → thu phí khám (UC005) → lập phiếu khám & cấp STT (UC003) → tra cứu hồ sơ (UC006). Làm đủ **GUI → BUS → DAO → SQL → kiểm thử → minh chứng** cho từng chức năng.
+> **Tóm tắt:** Huy phụ trách luồng tiếp nhận bên lễ tân: quản lý hồ sơ bệnh nhân (UC002) → thu phí khám (UC005) → lập phiếu khám & cấp STT (UC003). Làm đủ **GUI → BUS → DAO → SQL → kiểm thử → minh chứng** cho từng chức năng.
 > **Bắt buộc đọc trước:** [README_RULES.md](../../README_RULES.md) — mọi quy tắc đặt tên, kiểu dữ liệu, thông báo chuẩn, transaction, Git trong file này là ràng buộc. Vi phạm quy tắc đặt tên/kiểu dữ liệu → PR bị reject ngay không cần fix nhỏ.
 
 ---
@@ -12,10 +12,9 @@
 | LT-01 | UC002 — Quản lý hồ sơ bệnh nhân | `GD_QLBenhNhan` | 5 | 1 (làm đầu, mọi người phụ thuộc) |
 | LT-02 | UC005 — Thu tiền phí khám | `GD_ThuPhi` | 6 | 2 |
 | LT-03 | UC003 — Tiếp nhận & lập phiếu khám, cấp STT | `GD_LapPhieuKham` | 6 | 3 |
-| LT-04 | UC006 — Tra cứu hồ sơ bệnh nhân | `GD_TraCuuBenhNhan` | 3 | 4 |
-| LT-05 | Kiểm thử, tài liệu, demo cho cả 4 chức năng | — | 5 | song song |
+| LT-04 | Kiểm thử, tài liệu, demo cho cả 3 chức năng | — | 5 | 4 (kiểm thử song song các bước) |
 
-Tổng 25 — ước lượng khối lượng, không phải điểm môn học. Backlog có chủ nhiệm (không bắt buộc bản lõi, chốt ở M0): **LT-06 thanh toán dịch vụ cuối lượt** (cần mô hình liên kết hóa đơn–lượt khám; phối hợp Thắng cung cấp dịch vụ đã thực hiện).
+Tổng 22 — ước lượng khối lượng, không phải điểm môn học. Backlog có chủ nhiệm (không bắt buộc bản lõi, chốt ở M0): **LT-05 thanh toán dịch vụ cuối lượt** (cần mô hình liên kết hóa đơn–lượt khám; phối hợp Thắng cung cấp dịch vụ đã thực hiện).
 
 ## 2. File sở hữu (quy tắc một-chủ — người khác dùng lại, không sửa)
 
@@ -24,7 +23,7 @@ Tổng 25 — ước lượng khối lượng, không phải điểm môn học.
 | Model | `model/BenhNhan.java`, `model/PhieuKham.java`, `model/HoaDon.java`, `model/ChiTietHoaDon.java`, `model/TrangThaiPhieuKham.java` | Huy là chủ file nhóm này |
 | DAO | `dao/BenhNhan_DAO.java`, `dao/PhieuKham_DAO.java`, `dao/HoaDon_DAO.java`, `dao/ChiTietHoaDon_DAO.java` | Thắng, Thanh gọi qua đây — không viết DAO riêng cho phiếu khám |
 | BUS | `bus/BenhNhan_BUS.java`, `bus/PhieuKham_BUS.java`, `bus/HoaDon_BUS.java` | |
-| GUI | `gui/GD_QLBenhNhan_Controller.java` + `fxml/GD_QLBenhNhan.fxml`, `gui/GD_ThuPhi_Controller.java` + `fxml/GD_ThuPhi.fxml`, `gui/GD_LapPhieuKham_Controller.java` + `fxml/GD_LapPhieuKham.fxml`, `gui/GD_TraCuuBenhNhan_Controller.java` + `fxml/GD_TraCuuBenhNhan.fxml` | |
+| GUI | `gui/GD_QLBenhNhan_Controller.java` + `fxml/GD_QLBenhNhan.fxml`, `gui/GD_ThuPhi_Controller.java` + `fxml/GD_ThuPhi.fxml`, `gui/GD_LapPhieuKham_Controller.java` + `fxml/GD_LapPhieuKham.fxml` | |
 | SQL | `SourceCode/DATA/schema/005_benhnhan.sql`, `007_phieukham.sql`, `008_hoadon_chitiethoadon.sql` + seed tương ứng trong `SourceCode/DATA/seed/` | 007 phải khai báo `UNIQUE(soThuTu, ngayKham, maPhong)` |
 | Minh chứng | `TaiLieu/docs/evidence/huy/` — `design.md`, `implementation.md`, `test-cases.md`, `demo.md`, ảnh/video | |
 
@@ -120,22 +119,14 @@ Quy tắc (đúng thứ tự): quyền LE_TAN → VL05/VL07/VL08 → kiểm "ca 
 
 **Test case bắt buộc:** lập phiếu đủ điều kiện → STT = 1 (TC-LT03-01); phiếu thứ 2 cùng phòng/ngày STT = 2 (02); STT khác phòng độc lập (03); bác sĩ không nhận bệnh → TB03 (04); phòng tắt nhận bệnh → TB03 (05); gắn hóa đơn phí đã dùng → DB chặn UNIQUE → TB09/TB10 (06); ngắt giữa transaction → không có mã phiếu chết, bộ đếm không nhảy (07); nhấn Lập phiếu 2 lần nhanh → 2 phiếu khác mã khác STT, không trùng (08); in xem phiếu đúng thông tin (09).
 
-### 3.4. LT-04 — UC006: Tra cứu hồ sơ bệnh nhân (`GD_TraCuuBenhNhan`)
-
-**Mục tiêu (đặc tả):** tìm theo mã BN hoặc SĐT (mở rộng: họ tên), hiển thị hồ sơ; không thấy → "Không tìm thấy hồ sơ bệnh nhân".
-
-**GUI — `GD_TraCuuBenhNhan.fxml`:** `cbb_tieuChi` (Mã/SĐT/Họ tên) + `txt_tuKhoa` + `btn_tim`; `table_ketQua`; double-click dòng → modal chi tiết: thông tin hành chính + tiền sử + danh sách phiếu khám của BN (đọc `PhieuKham_DAO.layTheoBN`, chỉ đọc).
-
-**BUS — `BenhNhan_BUS.traCuu(session, tieuChi, tuKhoa)`:** quyền LE_TAN (Quản lý cũng được xem); không thấy → trả `List` rỗng, GUI Alert **TB05**. Mã/SĐT khớp chính xác qua SQL `WHERE`; họ tên lọc client-side theo mẫu N11 (nạp danh sách rồi `contains`).
-
-**Test case bắt buộc:** tìm theo mã đúng (TC-LT04-01); tìm SĐT (02); tên không dấu vẫn ra (03); không thấy → TB05 (04); tra cứu rỗng khóa mở chi tiết (05); hiển thị lịch sử phiếu đúng thứ tự ngày (06).
-
 ## 4. Thứ tự làm & phụ thuộc
 
-```
-M0 (nhóm): pom/khung App/ConnectDB/BoDem_Dao/util/schema 000-003 ──► LT-01 Hồ sơ ──► LT-02 Thu phí ──► LT-03 Lập phiếu ──► LT-04 Tra cứu
-LT-03 chờ Duy có `danhSachBacSiDangLamViec` + Thanh có `danhSachPhongDangNhanBenh` (M1) — trước đó dùng fake ghi rõ FAKE trong controller.
-```
+Điều kiện M0 của nhóm: pom/khung App/ConnectDB/BoDem_Dao/util/schema 000–003.
+
+1. **LT-01 — Quản lý hồ sơ bệnh nhân.**
+2. **LT-02 — Thu tiền phí khám.**
+3. **LT-03 — Lập phiếu khám và cấp STT.** Chờ Duy có `danhSachBacSiDangLamViec` và Thanh có `danhSachPhongDangNhanBenh` (M1); trước đó dùng fake, ghi rõ FAKE trong controller.
+4. **LT-04 — Kiểm thử, tài liệu, demo:** thực hiện song song từng chức năng và hoàn thiện sau khi ghép luồng.
 
 ## 5. Git workflow cá nhân
 
@@ -148,8 +139,8 @@ LT-03 chờ Duy có `danhSachBacSiDangLamViec` + Thanh có `danhSachPhongDangNha
 | Mốc | Huy phải có |
 | --- | --- |
 | M0 | Hoàn thiện schema 005/007/008; entity nhóm mình chắc `String`/`LocalDate`/`BigDecimal` đúng RULES |
-| M1 | 4 màn hình chạy với FAKE data |
-| M2 | 4 chức năng chạy DB local + test-cases.md hoàn chỉnh |
+| M1 | 3 màn hình chạy với FAKE data |
+| M2 | 3 chức năng chạy DB local + test-cases.md hoàn chỉnh |
 | M3 | Luồng demo chặng lễ tân chạy trơn với Thanh/Thắng/Duy |
 | M4 | design.md + demo.md + ảnh/video; tập trả lời câu hỏi bảo vệ |
 

@@ -48,7 +48,7 @@ Việc đặt lịch hẹn qua điện thoại/quét QR **không thuộc phạm 
 | UC003 | Tiếp nhận bệnh nhân — lập phiếu khám bệnh (kèm in phiếu) | Lễ tân | Huy |
 | UC004 | Ghi nhận khám và chẩn đoán | Bác sĩ | Thắng |
 | UC005 | Thu tiền phí khám | Lễ tân | Huy |
-| UC006 | Tra cứu hồ sơ bệnh nhân | Lễ tân | Huy |
+| UC006 | Tra cứu hồ sơ bệnh nhân | Lễ tân | Thanh |
 | UC007 | Quản lý danh mục dịch vụ | Quản lý | Duy |
 | UC008 | Xem báo cáo lượt khám (kèm xuất CSV, không có doanh thu) | Quản lý | Duy |
 | UC009 | Theo dõi hàng chờ (gọi số, xác nhận vào khám) | Phụ tá | Thanh |
@@ -146,7 +146,7 @@ PTUD_N15_/
 | `GD_Chinh.fxml` | khung điều hướng 1 cửa sổ | Duy |
 | `GD_TongQuan.fxml` | dashboard sau đăng nhập | Duy |
 | `GD_QLBenhNhan.fxml` | UC002 | Huy |
-| `GD_TraCuuBenhNhan.fxml` | UC006 | Huy |
+| `GD_TraCuuBenhNhan.fxml` | UC006 | Thanh |
 | `GD_ThuPhi.fxml` | UC005 | Huy |
 | `GD_LapPhieuKham.fxml` | UC003 | Huy |
 | `GD_HangCho.fxml` | UC009 | Thanh |
