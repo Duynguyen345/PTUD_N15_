@@ -16,9 +16,6 @@ import vn.nhom15.nhakhoa.App;
 import vn.nhom15.nhakhoa.bus.DichVu_BUS;
 import vn.nhom15.nhakhoa.bus.HoSoBenhAn_BUS;
 import vn.nhom15.nhakhoa.bus.KhamBenh_BUS;
-import vn.nhom15.nhakhoa.dao.ChiDinhDichVu_DAO;
-import vn.nhom15.nhakhoa.dao.ChiTietCapThuoc_DAO;
-import vn.nhom15.nhakhoa.dao.Thuoc_DAO;
 import vn.nhom15.nhakhoa.model.ChiDinhDichVu;
 import vn.nhom15.nhakhoa.model.ChiTietCapThuoc;
 import vn.nhom15.nhakhoa.model.DichVu;
@@ -67,6 +64,24 @@ public class GD_KhamBenh_Controller {
         cl_ma.setCellValueFactory(new PropertyValueFactory<>("maPhieuKham"));
         cl_bn.setCellValueFactory(new PropertyValueFactory<>("tenBenhNhan"));
         cl_tt.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getTrangThai().toString()));
+        cl_tt.setCellFactory(col -> new javafx.scene.control.TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    getStyleClass().removeAll("badge-cho", "badge-dang", "badge-hoan");
+                } else {
+                    setText(item);
+                    getStyleClass().removeAll("badge-cho", "badge-dang", "badge-hoan");
+                    getStyleClass().add(switch (item) {
+                        case "Chờ khám" -> "badge-cho";
+                        case "Đang khám" -> "badge-dang";
+                        default -> "badge-hoan";
+                    });
+                }
+            }
+        });
         table_danhSach.setOnMouseClicked(e -> {
             if (e.getClickCount() == 1) {
                 chonPhieu();
@@ -80,7 +95,7 @@ public class GD_KhamBenh_Controller {
         cl_ghiChuThuoc.setCellValueFactory(cd -> new SimpleStringProperty(
                 cd.getValue().getGhiChuCapThuoc() == null ? "" : cd.getValue().getGhiChuCapThuoc()));
         cbb_dichVu.setItems(FXCollections.observableArrayList(DichVu_BUS.danhSachDichVuDangPhucVu(App.session)));
-        cbb_thuoc.setItems(FXCollections.observableArrayList(Thuoc_DAO.getAllThuoc()));
+        cbb_thuoc.setItems(FXCollections.observableArrayList(KhamBenh_BUS.danhSachThuoc(App.session)));
         taiLai();
     }
 
@@ -90,6 +105,21 @@ public class GD_KhamBenh_Controller {
             var ds = KhamBenh_BUS.danhSachKhamCuaToi(App.session);
             table_danhSach.getItems().clear();
             table_danhSach.setItems(FXCollections.observableArrayList(ds));
+            if (!ds.isEmpty()) {
+                table_danhSach.getSelectionModel().selectFirst();
+                chonPhieu();
+            } else {
+                lb_bn.setText("(hôm nay chưa có phiếu khám của bạn)");
+                lb_tienSu.setText("");
+                ta_chanDoan.clear();
+                txt_ketQua.clear();
+                txt_thuocTuMua.clear();
+                chiDinhTam.clear();
+                thuocTam.clear();
+                napBangTam();
+                btn_luu.setDisable(true);
+                btn_hoanTat.setDisable(true);
+            }
         } catch (RuntimeException ex) {
             AlertUtil.baoLoi(ex.getMessage());
         }
@@ -108,8 +138,8 @@ public class GD_KhamBenh_Controller {
         ta_chanDoan.setText(pk.getChanDoan() == null ? "" : pk.getChanDoan());
         txt_ketQua.setText(pk.getKetQuaDieuTri() == null ? "" : pk.getKetQuaDieuTri());
         txt_thuocTuMua.setText(pk.getGhiChuThuocTuMua() == null ? "" : pk.getGhiChuThuocTuMua());
-        chiDinhTam = new ArrayList<>(ChiDinhDichVu_DAO.layTheoPhieu(pk.getMaPhieuKham()));
-        thuocTam = new ArrayList<>(ChiTietCapThuoc_DAO.layTheoPhieu(pk.getMaPhieuKham()));
+        chiDinhTam = new ArrayList<>(KhamBenh_BUS.layChiDinhCuaToi(App.session, pk.getMaPhieuKham()));
+        thuocTam = new ArrayList<>(KhamBenh_BUS.layThuocCapCuaToi(App.session, pk.getMaPhieuKham()));
         napBangTam();
         boolean choSua = pk.getTrangThai() == vn.nhom15.nhakhoa.model.TrangThaiPhieuKham.DANG_KHAM;
         btn_luu.setDisable(!choSua);

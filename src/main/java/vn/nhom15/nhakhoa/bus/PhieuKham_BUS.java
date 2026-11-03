@@ -79,6 +79,12 @@ public class PhieuKham_BUS {
         }
     }
 
+    /** Lich su kham toan he thong (man hinh Lich su kham — BAC_SI). */
+    public static java.util.List<PhieuKham> layToanBoLichSu(SessionContext session) {
+        QuyenUtil.kiemTraQuyen(session, ChucVu.BAC_SI);
+        return PhieuKham_DAO.layToanBoLichSu();
+    }
+
     private static void rollback(Connection con) {
         try {
             con.rollback();

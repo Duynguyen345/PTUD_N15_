@@ -135,6 +135,21 @@ public class PhieuKham_DAO {
         return ds;
     }
 
+    /** Toan bo lich su kham (moi trang thai) - man hinh Lich su kham. */
+    public static ArrayList<PhieuKham> layToanBoLichSu() {
+        String sql = "SELECT " + COLS + JOINS + " ORDER BY pk.ngayKham DESC, pk.soThuTu";
+        ArrayList<PhieuKham> ds = new ArrayList<>();
+        Connection con = ConnectDB.getInstance().getConnection();
+        try (PreparedStatement pstm = con.prepareStatement(sql); ResultSet rs = pstm.executeQuery()) {
+            while (rs.next()) {
+                ds.add(map(rs));
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Lỗi truy vấn lịch sử khám", ex);
+        }
+        return ds;
+    }
+
     /** Luu chuyen mon: UPDATE co dieu kien trang thai + chu phieu, bao ton tai ghi de truong luong khac. */
     public static int capNhatThongTinKham(Connection con, String maPhieuKham, String maBacSi, String chanDoan,
                                           String ketQuaDieuTri, String ghiChuThuocTuMua, String maHoSo) throws SQLException {

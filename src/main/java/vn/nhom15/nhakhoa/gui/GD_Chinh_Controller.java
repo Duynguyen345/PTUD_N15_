@@ -34,6 +34,7 @@ public class GD_Chinh_Controller {
         them("Lập phiếu khám (UC003)", "GD_LapPhieuKham", ChucVu.LE_TAN);
         them("Theo dõi hàng chờ (UC009)", "GD_HangCho", ChucVu.PHU_TA, ChucVu.QUAN_LY);
         them("Khám và chẩn đoán (UC004)", "GD_KhamBenh", ChucVu.BAC_SI);
+        them("Lịch sử khám", "GD_LichSuKham", ChucVu.BAC_SI);
         them("Quản lý nhân viên (UC010)", "GD_QLNhanVien", ChucVu.QUAN_LY);
         them("Quản lý dịch vụ (UC007)", "GD_QLDichVu", ChucVu.QUAN_LY);
         them("Báo cáo lượt khám (UC008)", "GD_BaoCao", ChucVu.QUAN_LY);
