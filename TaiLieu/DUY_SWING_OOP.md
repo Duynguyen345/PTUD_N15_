@@ -1,5 +1,7 @@
 # Phần Duy — Swing, OOP và JDBC
 
+Phân công cập nhật ngày 08/11/2026: Duy phụ trách xác thực đăng nhập, đăng xuất và quản lý tài khoản; **Thanh phụ trách phân quyền** tại BUS và phối hợp menu theo vai trò. Bỏ nhiệm vụ SQL schema/migration khỏi phân công cả nhóm. Bảng dưới mô tả chức năng hiện có, không phải giao toàn bộ phần phân quyền cho Duy. Xem [phân công 4 thành viên](../README.md#phân-công-nhiệm-vụ-4-thành-viên).
+
 ## Phạm vi màn hình
 
 | Màn hình | Luồng đã triển khai |
