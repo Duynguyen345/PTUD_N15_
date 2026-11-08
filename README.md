@@ -1,219 +1,78 @@
-# HỆ THỐNG QUẢN LÝ PHÒNG KHÁM NHA KHOA SÀI GÒN
+# Phòng khám nha khoa — phần Duy
 
-Đồ án môn học **Phát triển Ứng dụng (Application Development)** — Nhóm 15
-Trường Đại học Công nghiệp TP. Hồ Chí Minh (IUH) — Khoa Công nghệ Thông tin — Học kỳ I, năm học 2026–2027.
+Nhánh làm việc: **Duy_Tao_Moi**. **Java 21 · Swing · OOP · JDBC SQL Server**.
 
-> Cấu trúc repo theo chuẩn bộ nộp của Nhóm 11: **SourceCode** (mã nguồn Maven), **TaiLieu** (tài liệu), **FileDongGoi** (bản đóng gói — để trống, thêm sau), **FileTrinhChieu** (slide — để trống, thêm sau), **video** (demo — để trống, thêm sau).
+Đã có đăng nhập/phân quyền, khung điều hướng, tổng quan, nhân viên, tài khoản, dịch vụ, hàng hóa và báo cáo/CSV. Các màn nghiệp vụ của thành viên khác chưa nằm trong phạm vi này. Hai repo con được giữ nguyên.
 
-> 📚 **Trang tài liệu nhóm (trong `TaiLieu/`):** [README_RULES.md](TaiLieu/README_RULES.md) (quy tắc code chung) · [README_THANH.md](TaiLieu/docs/tasks/README_THANH.md) · [README_DUY.md](TaiLieu/docs/tasks/README_DUY.md) · [README_THANG.md](TaiLieu/docs/tasks/README_THANG.md) · [README_HUY.md](TaiLieu/docs/tasks/README_HUY.md) (nhiệm vụ từng thành viên) · [README_KHOI_NGHIEP.md](TaiLieu/README_KHOI_NGHIEP.md) (đề xuất khởi nghiệp — Chương 5 báo cáo) · [KICHBAN_THUC_NGHIEM.md](TaiLieu/KICHBAN_THUC_NGHIEM.md) (kịch bản kiểm thử S0–S11, bản .docx cùng thư mục).
+## Chạy thử ngay, không cần database
 
----
-
-## 1. Thành viên nhóm
-
-| STT | Họ tên | MSSV | Vai trò nhóm | Luồng phụ trách | Tài liệu nhiệm vụ |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Phan Chí Thanh | 24738801 | Facilitator | **Phụ tá + hạ tầng CSDL**: hàng chờ/gọi số, xác nhận vào khám + ConnectDB/BoDem/schema dùng chung | [README_THANH.md](TaiLieu/docs/tasks/README_THANH.md) |
-| 2 | Nguyễn Tuấn Duy | 24726131 | Reporter | **Quản lý**: đăng nhập/phân quyền, nhân viên, dịch vụ, báo cáo + khung ứng dụng | [README_DUY.md](TaiLieu/docs/tasks/README_DUY.md) |
-| 3 | Huỳnh Quốc Thắng | 22693891 | Recorder | **Bác sĩ**: khám & chẩn đoán, chỉ định dịch vụ, cấp thuốc, hoàn tất, lịch sử khám | [README_THANG.md](TaiLieu/docs/tasks/README_THANG.md) |
-| 4 | Hoàng Đình Huy | 22669751 | Time Keeper | **Lễ tân**: hồ sơ bệnh nhân, thu phí, lập phiếu khám, tra cứu | [README_HUY.md](TaiLieu/docs/tasks/README_HUY.md) |
-
-## 2. Giới thiệu đề tài
-
-Phòng khám Nha khoa Sài Gòn hiện quản lý bệnh nhân, phiếu khám và thanh toán bằng sổ tay và bảng tính, dẫn đến tra cứu chậm, dữ liệu trùng lặp, cấp số thứ tự dễ trùng và không có báo cáo tổng hợp. Đồ án xây dựng ứng dụng desktop bằng **Java + JavaFX kết nối SQL Server qua JDBC** để số hóa toàn bộ quy trình: tiếp nhận → thu phí khám → lập phiếu & cấp số thứ tự → gọi số vào khám → khám & chỉ định → hoàn tất → thanh toán → thống kê.
-
-**Phạm vi (trích nguyên văn báo cáo):**
-
-> "Đề tài tập trung xây dựng ứng dụng Java phục vụ công tác quản lý nội bộ tại Phòng khám Nha khoa Sài Gòn. Hệ thống hỗ trợ hình thức đăng ký khám trực tiếp, sử dụng hồ sơ điện tử và phiếu khám để quản lý thông tin bệnh nhân, từng lượt khám và số thứ tự theo phòng…"
-
-Việc đặt lịch hẹn qua điện thoại/quét QR **không thuộc phạm vi đồ án**, được phát triển riêng trong phần khởi nghiệp: [TaiLieu/README_KHOI_NGHIEP.md](TaiLieu/README_KHOI_NGHIEP.md).
-
-### 2.3. Tính năng hỗ trợ vận hành (AI + giao diện)
-
-| Tính năng | Vai trò dùng | Mô tả |
-| --- | --- | --- |
-| AI dự đoán thời gian chờ | Phụ tá | Ở màn Hàng chờ: chọn bệnh nhân → ước tính phút vào khám theo vị trí hàng chờ + lượt đang khám + thời lượng trung bình lịch sử |
-| AI dự báo vật tư | Quản lý | Màn "AI dự báo vật tư": dự báo găng tay/khẩu trang/vật liệu trám/thuốc tê 2 tuần tới theo dịch vụ đã chỉ định 30 ngày, kèm ghi chú nhu cầu |
-| Chế độ sáng / tối | Mọi vai trò | Nút chuyển ở sidebar; lưu theo phiên đăng nhập |
-| In phiếu khám | Lễ tân | Sau khi lập phiếu → "Xem phiếu" → In phiếu (máy in Windows) |
-
-> Cả 2 AI đều **chỉ hỗ trợ vận hành**, tính trực tiếp từ dữ liệu DB (offline, không can thiệp chẩn đoán/điều trị của bác sĩ).
-
-### 2.1. Tác nhân và danh sách use case (theo báo cáo Chương 3)
-
-| Mã | Tên use case | Tác nhân | Người hiện thực |
-| --- | --- | --- | --- |
-| UC001 | Đăng nhập hệ thống | Cả 4 tác nhân | Duy |
-| UC002 | Quản lý hồ sơ bệnh nhân | Lễ tân | Huy |
-| UC003 | Tiếp nhận bệnh nhân — lập phiếu khám bệnh (kèm in phiếu) | Lễ tân | Huy |
-| UC004 | Ghi nhận khám và chẩn đoán | Bác sĩ | Thắng |
-| UC005 | Thu tiền phí khám | Lễ tân | Huy |
-| UC006 | Tra cứu hồ sơ bệnh nhân | Lễ tân | Thanh |
-| UC007 | Quản lý danh mục dịch vụ | Quản lý | Duy |
-| UC008 | Xem báo cáo lượt khám (kèm xuất CSV, không có doanh thu) | Quản lý | Duy |
-| UC009 | Theo dõi hàng chờ (gọi số, xác nhận vào khám) | Phụ tá | Thanh |
-| UC010 | Quản lý nhân viên & tài khoản (nêu trong bảng tác nhân, đặc tả do nhóm chốt tối thiểu) | Quản lý | Duy |
-
-Bổ sung ngoài đặc tả UC nhưng có trong sơ đồ luồng Word: **Thanh toán dịch vụ cuối lượt** (Lễ tân) và **Lịch sử khám** (Bác sĩ/Quản lý).
-
-### 2.2. Luồng nghiệp vụ lõi (trạng thái phiếu khám)
-
-```
-CHO_KHAM ──(Phụ tá gọi số + xác nhận vào khám)──► DANG_KHAM ──(Bác sĩ hoàn tất)──► HOAN_TAT
+```powershell
+.\run.ps1 -Demo
 ```
 
-- Huy tạo phiếu với trạng thái `CHO_KHAM`; **chỉ** Thanh chuyển sang `DANG_KHAM`; **chỉ** Thắng chuyển sang `HOAN_TAT` (đã kiểm tra chẩn đoán/kết quả dịch vụ).
-- Thanh toán không làm đổi trạng thái khám. Không chuyển ngược trạng thái.
-- Chi tiết chuyển trạng thái và ràng buộc UPDATE: xem [TaiLieu/README_RULES.md](TaiLieu/README_RULES.md).
+Tài khoản quản lý demo: **TK2601010001 / 123456**. Các mã TK2601010002, TK2601010003, TK2601010004 dùng để thử phân quyền; cùng mật khẩu 123456. Chế độ demo hiện nhãn rõ ràng, dữ liệu chỉ giữ trong bộ nhớ và mất khi thoát.
 
-## 3. Công nghệ chốt (bắt buộc cả nhóm cùng dùng)
+Hoặc dùng Maven:
 
-| Thành phần | Chốt | Ghi chú |
-| --- | --- | --- |
-| JDK | **21** | khóa trong `pom.xml` (`maven.compiler.release=21`) |
-| Build | **Maven** — một `pom.xml` duy nhất tại `SourceCode/` | build đồng nhất mọi máy |
-| UI | **JavaFX 21 + FXML (Gluon Scene Builder)** | khớp báo cáo |
-| CSDL | **Microsoft SQL Server** (Express 2019/2022) + **SSMS** | tên DB: `N15_PTUD_DB` |
-| Driver JDBC | **mssql-jdbc 12.x.jre11** | khai báo trong `pom.xml` |
-| IDE | **VS Code** (Extension Pack for Java) + Scene Builder | |
-| Encoding | **UTF-8** | font UI: Segoe UI |
-
-## 4. Kiến trúc ứng dụng (CHỐT — mọi người code theo đúng mô hình này)
-
-Kiến trúc 3 lớp theo sơ đồ nhóm, hiện thực theo chuẩn mẫu của nhóm 11:
-
-```
-┌────────────────────────────────────────────────────────┐
-│  LỚP 1 — GUI (gui)                    │
-│  JavaFX FXML + Controller: nhận dữ liệu, validate nhẹ,  │
-│  bắt sự kiện, hiển thị. KHÔNG có SQL.                   │
-└───────────────▲────────────────────────────────────────┘
-                │ gọi hàm BUS (trả entity/List/boolean, ném lỗi message chuẩn)
-┌───────────────┴────────────────────────────────────────┐
-│  LỚP 2 — BUS (bus)                    │
-│  Kiểm tra dữ liệu nghiệp vụ, phân quyền, điều phối      │
-│  transaction nhiều bước. KHÔNG có câu lệnh SQL.         │
-└───────────────▲────────────────────────────────────────┘
-                │ gọi hàm DAO (PreparedStatement)
-┌───────────────┴────────────────────────────────────────┐
-│  LỚP 3 — DAO (dao)                    │
-│  JDBC — đọc/ghi SQL Server, ánh xạ ResultSet → Model.   │
-└───────────────▲────────────────────────────────────────┘
-                │ jdbc:sqlserver://localhost:1433;databaseName=N15_PTUD_DB
-        ┌───────┴────────┐
-        │  SQL SERVER    │   N15_PTUD_DB (SourceCode/DATA/schema/*.sql)
-        └────────────────┘
-  🔷 Model (model): POJO + enum dùng chung mọi lớp.
-  🔷 connect (connect): ConnectDB singleton — nơi DUY NHẤT cấp Connection.
-  🔷 util (util): FormatUtil, ValidateUtil, QuyenUtil, AlertUtil, MaThongBao, AIHoTro (AI dự đoán chờ + dự báo vật tư).
+```powershell
+mvn compile exec:java '-Dexec.args=--demo'
 ```
 
-**Quy tắc vàng:** GUI chỉ gọi BUS; BUS chỉ gọi DAO; DAO chỉ nói chuyện với SQL Server. Chi tiết từng tầng tại [TaiLieu/README_RULES.md](TaiLieu/README_RULES.md).
+`run.ps1` dùng cache Maven tại `$env:USERPROFILE\.m2\repository`, tránh cấu hình mặc định trỏ nhầm `C:\.m2`. Nếu PowerShell chặn script, dùng `powershell -ExecutionPolicy Bypass -File .\run.ps1 -Demo` cho lần chạy đó.
 
-### 4.1. Cấu trúc thư mục repo (chuẩn bộ nộp Nhóm 11)
+## Chạy với SQL Server thật
 
-```
-PTUD_N15_/
-├── SourceCode/                     ← toàn bộ mã nguồn (Maven)
-│   ├── pom.xml                     ← JDK 21, JavaFX 21, mssql-jdbc; Duy giữ quyền sửa
-│   ├── DATA/
-│   │   ├── schema/                 ← 000_hatang.sql … 012_*.sql (mỗi file một chủ)
-│   │   ├── seed/                   ← dữ liệu mẫu đi kèm từng schema
-│   │   └── README.md               ← hướng dẫn chạy SQL + cấu hình máy
-│   └── src/                        ← package phẳng Y CHANG Nhóm 11 (connectDB/dao/entity/gui/main/pic)
-│       ├── connectDB/ConnectDB.java  ← singleton kết nối (Thanh)
-│       ├── entity/                ← 16 entity + enum + SessionContext
-│       ├── dao/                   ← Xxx_DAO + BoDem_DAO (cấp mã tự động)
-│       ├── bus/                   ← Xxx_BUS (lớp nghiệp vụ riêng của nhóm)
-│       ├── gui/                   ← GD_*_Controller + toàn bộ FXML + ungdung.css (N11 để chung package)
-│       ├── main/                  ← App.java (entry) + TestRunner.java (34 test backend)
-│       ├── util/                  ← FormatUtil, ValidateUtil, QuyenUtil, AlertUtil, MaThongBao, AIHoTro
-│       ├── pic/                   ← logo + bộ icon FontAwesome
-│       └── db.properties(.example) ← CẤU HÌNH THẬT — KHÔNG commit
-├── TaiLieu/                        ← README_RULES, README_KHOI_NGHIEP, KICHBAN (md+docx),
-│   │                                  docs/tasks (nhiệm vụ 4 thành viên), docs/evidence (minh chứng)
-├── FileDongGoi/                    ← (để trống) bản đóng gói .jar/.exe khi nộp
-├── FileTrinhChieu/                 ← (để trống) slide thuyết trình khi nộp
-├── video/                          ← (để trống) video demo khi nộp
-└── README.md                       ← file này
+1. Trên instance SQL cần dùng, chạy `DATA/schema/001_fresh_database.sql` **một lần cho database mới N15_DUY_DB**. Không chạy file này trên database đã có các bảng tương ứng.
+2. Chọn database N15_DUY_DB trong SSMS, chạy `DATA/schema/020_duy_upgrade.sql`.
+3. Nếu cần dữ liệu thử, chạy `DATA/seed/001_duy_demo.sql` trong database mới. Seed xóa dữ liệu cũ trong các bảng Duy rồi nạp 10 nhân viên, 6 tài khoản, 8 dịch vụ, 8 hàng hóa, 14 phiếu khám và 28 chỉ định. Ngày báo cáo gắn với ngày chạy script.
+4. Tạo cấu hình riêng:
+
+```powershell
+Copy-Item src/main/resources/db.properties.example db.properties
 ```
 
-### 4.2. Màn hình ứng dụng (đặt tên chuẩn — cấm đặt lại)
+5. Sửa URL, SQL username và password theo máy. Database mặc định là `N15_DUY_DB`. Dùng SQL Authentication; cấu hình mẫu không dùng Windows integrated authentication. File thật đã được Git ignore.
+6. Chạy:
 
-| FXML (`SourceCode/src/main/resources/fxml/`) | Use case | Người |
-| --- | --- | --- |
-| `GD_DangNhap.fxml` | UC001 | Duy |
-| `GD_Chinh.fxml` | khung điều hướng 1 cửa sổ | Duy |
-| `GD_TongQuan.fxml` | dashboard sau đăng nhập | Duy |
-| `GD_QLBenhNhan.fxml` | UC002 | Huy |
-| `GD_TraCuuBenhNhan.fxml` | UC006 | Thanh |
-| `GD_ThuPhi.fxml` | UC005 | Huy |
-| `GD_LapPhieuKham.fxml` | UC003 | Huy |
-| `GD_HangCho.fxml` | UC009 | Thanh |
-| `GD_KhamBenh.fxml` | UC004 | Thắng |
-| `GD_LichSuKham.fxml` | lịch sử khám (sơ đồ luồng Word) | Thắng |
-| `GD_QLNhanVien.fxml` | UC010 | Duy |
-| `GD_QLDichVu.fxml` | UC007 | Duy |
-| `GD_ThanhToan.fxml` | thanh toán cuối lượt (sơ đồ luồng Word) | Huy |
-| `GD_BaoCao.fxml` | UC008 | Duy |
-| `GD_DuBaoVatTu.fxml` | AI dự báo vật tư (ngoài UC — theo khởi nghiệp) | Duy |
+```powershell
+.\run.ps1
+```
 
-## 5. Cơ sở dữ liệu (theo báo cáo Chương 4 — 12 bảng)
+Trên máy hiện tại, cổng `localhost:1433` thuộc **SQLEXPRESS**. Kết nối `localhost` mặc định trong SSMS/sqlcmd có thể trỏ instance khác; cần chọn đúng instance. Ví dụ sqlcmd: `-S tcp:localhost,1433`.
 
-`NhanVien`, `TaiKhoan`, `PhongKham`, `BenhNhan`, `HoSoBenhAn`, `DichVu`, `Thuoc`, `PhieuKham`, `HoaDon`, `ChiTietHoaDon`, `ChiDinhDichVu`, `ChiTietCapThuoc` — cộng bảng hạ tầng `BoDem` (bộ đếm mã) do Thanh chủ trì.
+Nếu dùng database cũ có schema tương thích, chạy lần lượt script 020 rồi 030_account_ids.sql và chỉnh `databaseName` trong cấu hình. Script 030 đổi cột tenDangNhap thành maTaiKhoan, cấp mã TK cho tài khoản tên cũ và trả bảng đối chiếu; hãy lưu mã mới để đăng nhập. Mật khẩu, nhân viên và trạng thái giữ nguyên. Không chạy file khởi tạo 001 hoặc seed lên dữ liệu thật. Ứng dụng không tự tạo/sửa schema khi mở.
 
-Quy ước chính (chi tiết đầy đủ trong [TaiLieu/README_RULES.md](TaiLieu/README_RULES.md)):
+## Kiến trúc OOP
 
-- Mã tự động theo ngày, cấp nguyên tử qua bảng `BoDem` trong transaction: `NVyyMMddNNNN`, `BNyyMMddNNNN`, `HSyyMMddNNNN`, `PKyyMMddNNNN`, `HDyyMMddNNNN`, `DVNNNN`, `THNNNN`, `PNNN`.
-- `PhieuKham.soThuTu`: UNIQUE theo cặp `(ngayKham, maPhong)`.
-- Tiền: `decimal(18,2)` ↔ `BigDecimal`; chuỗi tiếng Việt: `nvarchar`; trạng thái: `nvarchar` lưu đúng tên enum.
+```text
+UngDung: khởi tạo, truyền dependency
+GUI Swing → BUS → PhongKhamDAO (lớp xử lý JDBC)
+                    ├─ NguonKetNoi → SQL Server
+                    └─ PhongKhamDuLieuMauDAO kế thừa → bộ nhớ (chế độ demo)
+```
 
-## 6. Hướng dẫn cài đặt & chạy (làm đúng thứ tự)
+Chỉ giữ 9 entity/enum/record cần cho Duy: NhanVien, TaiKhoan, ChucVu, PhienDangNhap, DichVu, TrangThaiTaiKhoan, TrangThaiDichVu, HangHoa, DuLieuBaoCao. Đã bỏ 10 entity ngoài phạm vi. Session và Connection không dùng biến static. GUI không chứa SQL. Mỗi tác vụ IO chạy trên SwingWorker; BUS kiểm tra dữ liệu/quyền; DAO dùng PreparedStatement, transaction và đóng tài nguyên.
 
-1. **JDK 21** — cài Temurin JDK 21 (tick *Set JAVA_HOME*), `java -version` phải báo 21.
-2. **SQL Server + SSMS** — bật **TCP/IP 1433** trong SQL Server Configuration Manager và restart dịch vụ; bật **SQL Server + Windows Authentication mode**; enable user `sa`.
-3. **VS Code** — cài Extension Pack for Java + Maven for Java; **Scene Builder** (Gluon) để mở FXML.
-4. **Tạo DB** — trong SSMS (hoặc Git Bash `cd SourceCode/DATA` rồi vòng lặp sqlcmd theo `DATA/README.md`): chạy `schema/000_hatang.sql` → `012_*.sql` rồi `seed/*.sql`.
-5. **Cấu hình kết nối** — copy `SourceCode/src/db.properties.example` thành `db.properties`, sửa mật khẩu `sa` (file thật không commit).
-6. **Chạy app** — mở thư mục `SourceCode` trong VS Code (hoặc terminal `cd SourceCode`): `mvn clean compile` rồi `mvn javafx:run`.
-7. **Đăng nhập thử** — `letan / 123456` (các tài khoản seed xem `TaiLieu/../SourceCode/DATA/seed/002_seed_nhanvien_taikhoan.sql`).
+## Kiểm thử
 
-> ⚠️ Lỗi hay gặp (chưa kết nối được DB): port 1433 chưa bật, `encrypt=true` thiếu `trustServerCertificate=true`, sai driver — bẫy chi tiết ở [TaiLieu/README_RULES.md](TaiLieu/README_RULES.md).
+```powershell
+mvn test
+```
 
-## 7. Quy trình làm việc nhóm (Git/GitHub)
+Nếu Maven đang trỏ sai cache:
 
-- Nhánh ổn định: `master`. Nhánh làm việc cá nhân: `feat/<ban>-<mã>-<tên>`. Nhánh tổng hợp: `prj15/main`.
-- Mỗi chức năng = 1 Issue (prefix `LT-`/`QT-`/`BS-`/`PT-` theo luồng) = 1 PR. Commit conventional: `feat(uc003): lap phieu kham va cap so thu tu`.
-- Review xoay vòng: **Thanh review Duy → Duy review Thắng → Thắng review Huy → Huy review Thanh**.
-- Cấm: force push, commit trực tiếp lên `master`, commit `db.properties` thật, dữ liệu bệnh nhân thật.
+```powershell
+mvn "-Dmaven.repo.local=$env:USERPROFILE\.m2\repository" test
+```
 
-### Mốc tiến độ
+Bộ test kiểm tra nghiệp vụ, render màn hình và thao tác Swing. Test JDBC chỉ chạy khi truyền `-Dduy.jdbc.config=<file cấu hình kiểm thử>` và bắt buộc database tên `N15_DUY_TEST_*` đã có schema/seed. Không dùng database thật để chạy test ghi dữ liệu.
 
-| Mốc | Kết quả |
-| --- | --- |
-| **M0 — Chốt nền** | pom + khung package + ConnectDB + schema 000–003 + seed |
-| **M1 — GUI từng luồng** | màn hình chạy với dữ liệu mẫu |
-| **M2 — BUS/DAO với DB** | chức năng chạy DB local + test case |
-| **M3 — Ghép luồng** | Lễ tân → Phụ tá → Bác sĩ → Quản lý chạy trơn |
-| **M4 — Nghiệm thu** | kiểm tra chéo, cập nhật Word/PPT, tập demo |
+Chi tiết luồng, cách áp dụng OOP và kịch bản demo: [TaiLieu/DUY_SWING_OOP.md](TaiLieu/DUY_SWING_OOP.md).
 
-## 8. Trình bày & bảo vệ
+## Mã tài khoản tự sinh
 
-Luồng demo chuẩn sau đăng nhập (mỗi người trình bày chặng của mình):
+Khi tạo tài khoản, chỉ chọn nhân viên và nhập mật khẩu. Hệ thống cấp mã theo dạng TKyyMMddNNNN trong cùng transaction với INSERT, kiểm tra trùng và trả mã về giao diện. Ô mã chỉ đọc; không có tên đăng nhập tự đặt. Đăng nhập bằng mã TK được cấp. Seed demo cũng cấp mã từ bộ đếm, với ngày mô phỏng 01/01/2026.
 
-1. **Duy** — giới thiệu, đăng nhập phân quyền, khung ứng dụng.
-2. **Huy** — tìm/tạo hồ sơ bệnh nhân → thu phí khám → lập phiếu, cấp STT.
-3. **Thanh** — theo dõi hàng chờ theo phòng → gọi số → xác nhận vào khám.
-4. **Thắng** — nhận danh sách khám → xem tiền sử → chẩn đoán, chỉ định, cấp thuốc → hoàn tất (+ lịch sử khám).
-5. **Huy** — thanh toán dịch vụ cuối lượt.
-6. **Duy** — quản lý nhân viên/dịch vụ → báo cáo lượt khám → xuất CSV.
+Schema mới chỉ chứa phần Duy và hai bảng dữ liệu nguồn PhieuKham/ChiDinhDichVu cho báo cáo. Không có luồng tiếp nhận, khám bệnh, cấp thuốc hay thanh toán. Việc dọn áp dụng repo gốc; hai repo con và database hiện có không bị xóa.
 
-Mỗi thành viên phải lần theo được một thao tác từ GUI xuống DB (GUI → BUS → DAO → SQL). Minh chứng lưu `TaiLieu/docs/evidence/<tên>/`.
-
----
-
-## 9. Tham khảo
-
-- Báo cáo môn học `Nhom15_REPORT_ApplicationDevelopment_v3.docx` (nguồn nghiệp vụ chính thức — không sửa trực tiếp).
-- Source mẫu khóa trước: `PTUD_2025_Nhom11_DHKHMT18A/SourceCode/…/PTUD_N11_2025fx` (chuẩn GUI→DAO, ConnectDB, DAO, entity, controller/FXML).
-- [OpenJFX — JavaFX + Maven](https://openjfx.io/openjfx-docs/#maven) · [Microsoft JDBC for SQL Server](https://learn.microsoft.com/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server) · [GitHub Flow](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/github-flow).
+Bộ dữ liệu mới dùng chung một nguồn cho DEMO và SQL. Xem [danh sách tài khoản và kết quả tìm kiếm mẫu](TaiLieu/DU_LIEU_MAU.md).
