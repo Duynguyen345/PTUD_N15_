@@ -22,7 +22,7 @@ public final class GenerateDemoSeed {
     private void generate() throws Exception {
         for (String kind : List.of("NV", "TK", "DV", "HH", "PK"))
             groups.put(kind, new ArrayList<>());
-        for (String row : Files.readAllLines(Path.of("src/main/resources/demo/dataset.tsv"),
+        for (String row : Files.readAllLines(Path.of("src/test/resources/demo/dataset.tsv"),
                 StandardCharsets.UTF_8)) {
             if (row.isBlank() || row.startsWith("#"))
                 continue;
@@ -65,17 +65,17 @@ public final class GenerateDemoSeed {
                     + text(r[2]) + "," + text(r[1]) + ");");
         }
         for (String[] r : groups.get("DV"))
-            line("INSERT INTO dbo.DichVu VALUES(" + String.join(",", text(r[1]), text(r[2]), r[3], text(r[4]))
+            line("INSERT INTO dbo.DichVu(maDichVu,tenDichVu,donGiaNiemYet,trangThai) VALUES(" + String.join(",", text(r[1]), text(r[2]), r[3], text(r[4]))
                     + ");");
         for (String[] r : groups.get("HH"))
-            line("INSERT INTO dbo.HangHoa VALUES("
+            line("INSERT INTO dbo.HangHoa(maHangHoa,tenHangHoa,donViTinh,soLuongTon,mucTonToiThieu) VALUES("
                     + String.join(",", text(r[1]), text(r[2]), text(r[3]), r[4], r[5]) + ");");
         for (String[] r : groups.get("PK")) {
             line("INSERT INTO dbo.PhieuKham(maPhieuKham,ngayKham,trangThai,maNhanVien) VALUES(" + String.join(
                     ",", text(r[1]), "DATEADD(day,-" + Integer.parseInt(r[2]) + ",CAST(GETDATE() AS date))",
                     text(r[3]), text(r[4])) + ");");
             for (String service : r[5].split(","))
-                line("INSERT INTO dbo.ChiDinhDichVu VALUES(" + text(r[1]) + "," + text(service) + ");");
+                line("INSERT INTO dbo.ChiDinhDichVu(maPhieuKham,maDichVu) VALUES(" + text(r[1]) + "," + text(service) + ");");
         }
         for (String kind : List.of("NV", "DV", "HH")) {
             int cut = kind.equals("DV") ? 2 : 8;

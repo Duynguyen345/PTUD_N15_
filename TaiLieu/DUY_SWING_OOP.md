@@ -22,13 +22,18 @@ Vai trò Lễ tân/Bác sĩ/Phụ tá đăng nhập được nhưng chỉ thấy
 `UngDung` là nơi khởi tạo và truyền dependency qua constructor:
 
 ```text
-Swing panels → DangNhapBUS / NhanSuBUS / DanhMucBUS / BaoCaoBUS
-             → PhongKhamDAO (lớp xử lý JDBC)
-                 ├─ NguonKetNoi → KetNoiCSDL → SQL Server
-                 └─ PhongKhamDuLieuMauDAO kế thừa → dữ liệu trong bộ nhớ
+GUI đăng nhập → DangNhapBUS → DangNhapDAO
+GUI nhân viên → NhanVienBUS → NhanVienDAO
+GUI tài khoản → TaiKhoanBUS → TaiKhoanDAO
+GUI dịch vụ   → DichVuBUS   → DichVuDAO
+GUI hàng hóa  → HangHoaBUS  → HangHoaDAO
+GUI báo cáo   → BaoCaoBUS   → BaoCaoDAO
+DAO từng luồng → JdbcDAO → NguonKetNoi → KetNoiCSDL → SQL Server
 ```
 
-- Không có session/connection static; chỉ `main` là điểm vào static.
+`UngDung` khởi tạo trực tiếp từng DAO với cùng nguồn kết nối SQL Server. Ứng dụng không có chế độ demo; dữ liệu giả lập và `BoDAO` chỉ nằm trong `src/test` để kiểm thử. Mỗi BUS chỉ nhận DAO của luồng mình; `QuanLyPhienDangNhap` nhận `DangNhapDAO`. SQL nghiệp vụ nằm trong từng DAO, còn `JdbcDAO` chỉ giữ các hàm hỗ trợ kết nối, truy vấn, transaction và sinh mã.
+
+- Không có session/connection static.
 - `QuanLyPhienDangNhap` quản lý phiên của một cửa sổ. BUS kiểm tra quyền quản lý và trạng thái tài khoản/nhân viên hiện hành trong kho dữ liệu.
 - Chỉ giữ entity cần cho phần Duy; `TaiKhoan` dùng thuộc tính `maTaiKhoan`. `HangHoa`, `DuLieuBaoCao` là record bất biến.
 - `ManHinhCoSo` chia sẻ phần trình bày và form; `BangDuLieu<T>` tái sử dụng bảng có tìm kiếm/sắp xếp; mỗi màn giữ trách nhiệm riêng.
@@ -48,10 +53,10 @@ Swing panels → DangNhapBUS / NhanSuBUS / DanhMucBUS / BaoCaoBUS
 
 ## Kịch bản nghiệm thu
 
-1. `run.ps1 -Demo`, đăng nhập `TK2601010001 / 123456`. Banner DEMO luôn hiện; dữ liệu không lưu khi đóng ứng dụng.
+1. Cấu hình `db.properties`, chạy `run.ps1` và đăng nhập tài khoản quản lý trong database. Nếu đã nạp seed SQL vào database thử nghiệm riêng, dùng `TK2601010001 / 123456`. Dữ liệu thay đổi được lưu trong SQL Server.
 2. Nhân viên: thử SĐT sai, dưới 18 tuổi; thêm hợp lệ, chọn dòng sửa; thử xóa nhân viên có tài khoản.
 3. Tài khoản: tạo cho nhân viên vừa thêm; thử tạo lần nữa cho nhân viên đã có tài khoản; khóa, đăng xuất và thử đăng nhập tài khoản đó.
-4. Đăng nhập `TK2601010002 / 123456`: không có menu quản lý. Các kiểm thử gọi trực tiếp BUS cũng phải bị từ chối.
+4. Với database đã nạp seed kiểm thử, đăng nhập `TK2601010002 / 123456`: không có menu quản lý. Các kiểm thử gọi trực tiếp BUS cũng phải bị từ chối.
 5. Dịch vụ: thử giá 0/âm/chữ, tên trùng; thêm hợp lệ rồi đổi trạng thái ngừng phục vụ.
 6. Hàng hóa: nhập tồn = ngưỡng, phải hiện Cần bổ sung; tăng tồn lớn hơn ngưỡng, phải hiện Đủ hàng.
 7. Báo cáo: xem 7 ngày; chọn từ > đến; chọn ngày năm 1900; xuất CSV và kiểm tra tiếng Việt/cột/ngày.
@@ -59,7 +64,7 @@ Swing panels → DangNhapBUS / NhanSuBUS / DanhMucBUS / BaoCaoBUS
 
 ## Kiểm thử tự động
 
-- `NghiepVuQuanLyTest`: xác thực, phân quyền, validation, CRUD, khóa/mở, tham chiếu, CSV.
+- `NghiepVuQuanLyTest`: xác thực, phân quyền, validation, CRUD, khóa/mở theo dữ liệu mới nhất, tìm nhân viên đủ điều kiện tại BUS, tham chiếu và CSV.
 - `ManHinhSwingTest`: nạp/render 7 màn hình và chạy tác vụ nền; ảnh ở `target/ui-preview`.
 - `LuongGiaoDienTest`: đăng nhập qua sự kiện Swing, điều hướng và thêm dịch vụ từ form; ảnh khung đầy đủ ở `target/workspace-preview.png`.
 - `TichHopJdbcTest`: chạy khi có `-Dduy.jdbc.config=<file>`; chỉ chấp nhận database tên `N15_DUY_TEST_*`. Bao gồm CRUD SQL thật, khóa/mở, PBKDF2, chống xóa tham chiếu, hai luồng tạo dịch vụ đồng thời, báo cáo từ seed. Dùng database kiểm thử riêng và dọn sau khi chạy.
@@ -68,7 +73,7 @@ Lệnh thông thường: `mvn test`. Không có cấu hình riêng thì test JDB
 
 ## Thay đổi mã tài khoản
 
-Mã đăng nhập là TKyyMMddNNNN do DAO cấp trong transaction bằng DuyBoDem; BUS không nhận tham số tên đăng nhập tự đặt. GUI chỉ hiển thị mã và thông báo mã sau khi tạo thành công. DangNhapBUS từ chối tên dạng quanly/bacsi1. Database cũ dùng script 030_account_ids.sql; không giữ alias đăng nhập cũ. Seed demo dùng bộ đếm ngày mô phỏng 01/01/2026, tài khoản quản lý đầu tiên là TK2601010001.
+Mã đăng nhập là TKyyMMddNNNN do DAO cấp trong transaction bằng DuyBoDem; BUS không nhận tham số tên đăng nhập tự đặt. GUI chỉ hiển thị mã và thông báo mã sau khi tạo thành công. DangNhapBUS từ chối tên dạng quanly/bacsi1. Database cũ dùng script 030_account_ids.sql; không giữ alias đăng nhập cũ. Seed SQL kiểm thử dùng bộ đếm ngày mô phỏng 01/01/2026, tài khoản quản lý đầu tiên là TK2601010001.
 
 ## Trạng thái danh sách trước khi tìm kiếm
 

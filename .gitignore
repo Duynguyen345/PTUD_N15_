@@ -6,8 +6,10 @@ out/
 *.log
 *.iml
 .idea/
+.vs/
 .settings/
 .classpath
 .project
 .DS_Store
 **/db.properties
+merge-backup-*/

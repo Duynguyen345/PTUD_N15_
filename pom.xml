@@ -8,6 +8,7 @@
     <version>1.0.0</version>
     <name>Nha khoa - Swing JDBC</name>
     <properties>
+        <build.output>target</build.output>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -25,6 +26,9 @@
         </dependency>
     </dependencies>
     <build>
+        <directory>${build.output}</directory>
+        <sourceDirectory>src/main</sourceDirectory>
+        <testSourceDirectory>src/test</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -35,13 +39,21 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
+                <configuration>
+                    <excludes>
+                        <exclude>resources/**</exclude>
+                    </excludes>
+                    <testExcludes>
+                        <testExclude>resources/**</testExclude>
+                    </testExcludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>vn.nhom15.nhakhoa.UngDung</mainClass>
+                    <mainClass>UngDung</mainClass>
                 </configuration>
             </plugin>
         </plugins>
