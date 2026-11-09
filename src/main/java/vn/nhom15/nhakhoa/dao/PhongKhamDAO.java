@@ -59,7 +59,7 @@ public class PhongKhamDAO {
             "Dữ liệu đã tồn tại: kiểm tra tên dịch vụ, tên hàng, mã tài khoản hoặc tài khoản của nhân viên.";
         case 547 ->
             "Dữ liệu đang được sử dụng hoặc không hợp lệ. Không thể xóa nhân viên đã có tài khoản/phiếu khám.";
-        case 208, 207 -> "Database thiếu bảng hoặc cột. Chạy script nâng cấp Duy trước khi sử dụng.";
+        case 208, 207 -> "Database thiếu bảng hoặc cột. Chạy DATA/nhakhoa_sqlserver.sql trước khi sử dụng.";
         default ->
             "Không thực hiện được thao tác database. Kiểm tra db.properties, SQL Server và script cài đặt.";
         };

@@ -7,7 +7,7 @@ import vn.nhom15.nhakhoa.entity.*;
 import vn.nhom15.nhakhoa.entity.DuLieuBaoCao.DongThongKe;
 import vn.nhom15.nhakhoa.util.BoBamMatKhau;
 
-/** Kho dữ liệu DEMO tách biệt, không kết nối SQL và không lưu sau khi thoát. */
+/** Kho giả lập chỉ dùng trong kiểm thử; ứng dụng chính luôn dùng JDBC. */
 public final class PhongKhamDuLieuMauDAO extends PhongKhamDAO {
     private final Map<String, NhanVien> danhSachNhanVien = new LinkedHashMap<>();
     private final Map<String, TaiKhoan> danhSachTaiKhoan = new LinkedHashMap<>();

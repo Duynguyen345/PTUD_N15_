@@ -1,4 +1,4 @@
-# Duy demo v2. Dữ liệu giả lập; TSV UTF-8 là nguồn chung của DEMO và SQL seed.
+# Dữ liệu cố định chỉ dùng kiểm thử, không được nạp khi chạy ứng dụng SQL Server.
 # NV: mã | họ tên | SĐT | ngày sinh | giới tính | CCCD | chức vụ | còn làm việc
 NV	NV2601010001	Lê Hoàng Minh	0901234501	1985-05-15	true	079000000001	QUAN_LY	true
 NV	NV2601010002	Nguyễn Thị Anh	0912345678	1996-02-20	false	079000000002	LE_TAN	true

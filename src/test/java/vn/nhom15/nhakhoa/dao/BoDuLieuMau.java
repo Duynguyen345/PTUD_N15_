@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vn.nhom15.nhakhoa.entity.*;
 
-/** Nạp cùng dữ liệu nguồn mà DATA/GenerateDemoSeed.java dùng để sinh SQL. */
+/** Nạp dữ liệu cố định dành riêng cho bộ kiểm thử. */
 public final class BoDuLieuMau {
     public record TaiKhoanMau(String maNhanVien, TrangThaiTaiKhoan trangThai) {
     }

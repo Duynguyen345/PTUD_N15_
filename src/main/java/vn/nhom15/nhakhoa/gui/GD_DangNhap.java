@@ -8,7 +8,7 @@ public final class GD_DangNhap extends ManHinhCoSo {
     private final JTextField maTaiKhoan = new JTextField();
     private final JPasswordField matKhau = new JPasswordField();
 
-    public GD_DangNhap(DangNhapBUS dangNhapBUS, BoXuLyTacVuGiaoDien boXuLy, boolean duLieuMau,
+    public GD_DangNhap(DangNhapBUS dangNhapBUS, BoXuLyTacVuGiaoDien boXuLy,
             Runnable khiDangNhapThanhCong) {
         super("", "", boXuLy);
         removeAll();

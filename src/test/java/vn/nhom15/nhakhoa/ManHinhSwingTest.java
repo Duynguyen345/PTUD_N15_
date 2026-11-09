@@ -38,7 +38,7 @@ class ManHinhSwingTest {
                 throw new RuntimeException(loi);
             }
             UIManager.put("defaultFont", new Font("Segoe UI", Font.PLAIN, 14));
-            cacManHinh.add(new GD_DangNhap(dangNhapBUS, boXuLy, true, () -> {
+            cacManHinh.add(new GD_DangNhap(dangNhapBUS, boXuLy, () -> {
             }));
             cacManHinh.add(new GD_TongQuan(nhanSuBUS, danhMucBUS, boXuLy));
             cacManHinh.add(new GD_NhanVien(nhanSuBUS, boXuLy));

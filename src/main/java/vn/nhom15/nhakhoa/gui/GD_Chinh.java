@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import javax.swing.*;
 import vn.nhom15.nhakhoa.bus.*;
 import vn.nhom15.nhakhoa.entity.ChucVu;
+import vn.nhom15.nhakhoa.entity.Quyen;
 
 /** Cửa sổ duy nhất; đăng xuất hủy toàn bộ màn hình của phiên trước. */
 public final class GD_Chinh extends JFrame {
@@ -13,20 +14,30 @@ public final class GD_Chinh extends JFrame {
     private final NhanSuBUS nhanSuBUS;
     private final DanhMucBUS danhMucBUS;
     private final BaoCaoBUS baoCaoBUS;
-    private final boolean duLieuMau;
+    private final DieuPhoiBUS dieuPhoiBUS;
+    private final TraCuuHoSoBUS traCuuBUS;
+    private GD_BangGoiSo bangGoiSo;
     private final BoXuLyTacVuGiaoDien boXuLy = new BoXuLyTacVuGiaoDien();
     private JPanel vungNoiDung;
     private JLabel tenTrang;
 
     public GD_Chinh(DangNhapBUS dangNhapBUS, QuanLyPhienDangNhap quanLyPhien, NhanSuBUS nhanSuBUS,
-            DanhMucBUS danhMucBUS, BaoCaoBUS baoCaoBUS, boolean duLieuMau) {
+            DanhMucBUS danhMucBUS, BaoCaoBUS baoCaoBUS) {
+        this(dangNhapBUS, quanLyPhien, nhanSuBUS, danhMucBUS, baoCaoBUS, null, null);
+    }
+
+    /** Constructor đầy đủ kết nối chức năng quản trị và chức năng điều phối/tra cứu. */
+    public GD_Chinh(DangNhapBUS dangNhapBUS, QuanLyPhienDangNhap quanLyPhien, NhanSuBUS nhanSuBUS,
+            DanhMucBUS danhMucBUS, BaoCaoBUS baoCaoBUS, DieuPhoiBUS dieuPhoiBUS,
+            TraCuuHoSoBUS traCuuBUS) {
         super("Nha khoa Sài Gòn — Quản lý");
         this.dangNhapBUS = dangNhapBUS;
         this.quanLyPhien = quanLyPhien;
         this.nhanSuBUS = nhanSuBUS;
         this.danhMucBUS = danhMucBUS;
         this.baoCaoBUS = baoCaoBUS;
-        this.duLieuMau = duLieuMau;
+        this.dieuPhoiBUS = dieuPhoiBUS;
+        this.traCuuBUS = traCuuBUS;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1180, 720));
         setSize(1380, 820);
@@ -35,8 +46,9 @@ public final class GD_Chinh extends JFrame {
     }
 
     private void hienThiDangNhap() {
+        if (bangGoiSo != null) { bangGoiSo.dispose(); bangGoiSo = null; }
         quanLyPhien.dangXuat();
-        GD_DangNhap dangNhap = new GD_DangNhap(dangNhapBUS, boXuLy, duLieuMau, this::hienThiKhongGianLamViec);
+        GD_DangNhap dangNhap = new GD_DangNhap(dangNhapBUS, boXuLy, this::hienThiKhongGianLamViec);
         setContentPane(dangNhap);
         revalidate();
         repaint();
@@ -67,7 +79,7 @@ public final class GD_Chinh extends JFrame {
         vungGiua.add(vungNoiDung, BorderLayout.CENTER);
         goc.add(thanhBen, BorderLayout.WEST);
         goc.add(vungGiua, BorderLayout.CENTER);
-        if (quanLyPhien.phienHienTai().getChucVu() == ChucVu.QUAN_LY) {
+        if (coQuyen(Quyen.QUAN_TRI)) {
             themNutDieuHuong(thanhBen, "Tổng quan", () -> new GD_TongQuan(nhanSuBUS, danhMucBUS, boXuLy));
             themNutDieuHuong(thanhBen, "Nhân viên", () -> new GD_NhanVien(nhanSuBUS, boXuLy));
             themNutDieuHuong(thanhBen, "Tài khoản", () -> new GD_TaiKhoan(nhanSuBUS, boXuLy));
@@ -75,6 +87,12 @@ public final class GD_Chinh extends JFrame {
             themNutDieuHuong(thanhBen, "Hàng hóa", () -> new GD_HangHoa(danhMucBUS, boXuLy));
             themNutDieuHuong(thanhBen, "Báo cáo", () -> new GD_BaoCao(baoCaoBUS, boXuLy));
         }
+        if (dieuPhoiBUS != null && coQuyen(Quyen.XEM_HANG_CHO))
+            themNutDieuHuong(thanhBen, "Hàng chờ / Gọi số", this::taoHangCho);
+        if (dieuPhoiBUS != null && coQuyen(Quyen.BAT_TAT_PHONG))
+            themNutDieuHuong(thanhBen, "Phòng nhận bệnh", () -> new GD_PhongKham(dieuPhoiBUS, boXuLy));
+        if (traCuuBUS != null && coQuyen(Quyen.TRA_CUU_HO_SO))
+            themNutDieuHuong(thanhBen, "Tra cứu hồ sơ", () -> new GD_TraCuuHoSo(traCuuBUS, boXuLy));
         thanhBen.add(Box.createVerticalGlue());
         JButton nutDangXuat = new JButton("Đăng xuất");
         nutDangXuat.setMaximumSize(new Dimension(190, 42));
@@ -89,6 +107,10 @@ public final class GD_Chinh extends JFrame {
         repaint();
         if (quanLyPhien.phienHienTai().getChucVu() == ChucVu.QUAN_LY)
             moManHinh("Tổng quan", new GD_TongQuan(nhanSuBUS, danhMucBUS, boXuLy));
+        else if (dieuPhoiBUS != null && coQuyen(Quyen.XEM_HANG_CHO))
+            moManHinh("Hàng chờ / Gọi số", taoHangCho());
+        else if (traCuuBUS != null && coQuyen(Quyen.TRA_CUU_HO_SO))
+            moManHinh("Tra cứu hồ sơ", new GD_TraCuuHoSo(traCuuBUS, boXuLy));
         else {
             tenTrang.setText("Phiên " + quanLyPhien.phienHienTai().getChucVu());
             JTextArea thongBaoQuyen = new JTextArea("Đăng nhập thành công với vai trò "
@@ -102,6 +124,25 @@ public final class GD_Chinh extends JFrame {
             vungNoiDung.add(thongBaoQuyen);
             revalidate();
         }
+    }
+
+    private boolean coQuyen(Quyen quyen) {
+        return quanLyPhien.phienHienTai() != null
+                && PhanQuyenBUS.layQuyen(quanLyPhien.phienHienTai().getChucVu()).contains(quyen);
+    }
+
+    private GD_HangCho taoHangCho() {
+        return new GD_HangCho(dieuPhoiBUS, coQuyen(Quyen.DIEU_PHOI_HANG_CHO), boXuLy, () -> {
+            if (bangGoiSo == null || !bangGoiSo.isDisplayable()) bangGoiSo = new GD_BangGoiSo(dieuPhoiBUS);
+            bangGoiSo.setVisible(true);
+            bangGoiSo.toFront();
+        });
+    }
+
+    @Override
+    public void dispose() {
+        if (bangGoiSo != null) bangGoiSo.dispose();
+        super.dispose();
     }
 
     private void themNutDieuHuong(JPanel thanhBen, String nhan, Supplier<ManHinhCoSo> manHinh) {

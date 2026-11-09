@@ -1,5 +1,5 @@
 # Copy this file to db.properties in the project root. Do not commit credentials.
 # Local development SQL Server; use a trusted certificate outside local development.
-db.url=jdbc:sqlserver://localhost:1433;databaseName=N15_DUY_DB;encrypt=true;trustServerCertificate=true
+db.url=jdbc:sqlserver://localhost:1433;databaseName=N15_NHAKHOA_DB;encrypt=true;trustServerCertificate=true
 db.user=sa
 db.password=YOUR_PASSWORD

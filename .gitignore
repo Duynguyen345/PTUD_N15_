@@ -11,3 +11,4 @@ out/
 .project
 .DS_Store
 **/db.properties
+dist/

@@ -22,7 +22,7 @@ public final class GenerateDemoSeed {
     private void generate() throws Exception {
         for (String kind : List.of("NV", "TK", "DV", "HH", "PK"))
             groups.put(kind, new ArrayList<>());
-        for (String row : Files.readAllLines(Path.of("src/main/resources/demo/dataset.tsv"),
+        for (String row : Files.readAllLines(Path.of("src/test/resources/demo/dataset.tsv"),
                 StandardCharsets.UTF_8)) {
             if (row.isBlank() || row.startsWith("#"))
                 continue;

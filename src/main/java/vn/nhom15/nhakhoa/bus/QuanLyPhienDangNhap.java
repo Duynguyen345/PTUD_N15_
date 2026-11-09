@@ -13,12 +13,12 @@ public final class QuanLyPhienDangNhap {
         this.phongKhamDAO = phongKhamDAO;
     }
 
-    void batDauPhien(String maTaiKhoan, PhienDangNhap phien) {
+    synchronized void batDauPhien(String maTaiKhoan, PhienDangNhap phien) {
         this.maTaiKhoan = maTaiKhoan;
         phienHienTai = phien;
     }
 
-    public void dangXuat() {
+    public synchronized void dangXuat() {
         phienHienTai = null;
         maTaiKhoan = null;
     }
@@ -28,15 +28,25 @@ public final class QuanLyPhienDangNhap {
     }
 
     public void kiemTraQuyenQuanLy() {
+        kiemTraQuyen(Quyen.QUAN_TRI);
+    }
+
+    /** Kiểm tra lại tài khoản và vai trò hiện hành, kể cả sau khi đã đăng nhập. */
+    public synchronized void kiemTraQuyen(Quyen quyen) {
         PhienDangNhap phien = phienHienTai;
         String dangNhap = maTaiKhoan;
-        if (phien == null || phien.getChucVu() != ChucVu.QUAN_LY || dangNhap == null)
-            throw new SecurityException("Bạn không có quyền quản lý.");
+        if (phien == null || dangNhap == null)
+            throw new SecurityException("Vui lòng đăng nhập trước khi sử dụng chức năng.");
         TaiKhoan taiKhoan = phongKhamDAO.timTaiKhoan(dangNhap);
         NhanVien nhanVien = phongKhamDAO.danhSachNhanVien().stream()
                 .filter(n -> n.getMaNhanVien().equals(phien.getMaNhanVien())).findFirst().orElse(null);
         if (taiKhoan == null || taiKhoan.getTrangThai() != TrangThaiTaiKhoan.HOAT_DONG || nhanVien == null
-                || !nhanVien.isConLamViec() || nhanVien.getChucVu() != ChucVu.QUAN_LY)
+                || !taiKhoan.getMaNhanVien().equals(phien.getMaNhanVien())
+                || !nhanVien.isConLamViec() || nhanVien.getChucVu() != phien.getChucVu()) {
+            dangXuat();
             throw new SecurityException("Quyền truy cập đã thay đổi. Vui lòng đăng xuất.");
+        }
+        if (!PhanQuyenBUS.layQuyen(nhanVien.getChucVu()).contains(quyen))
+            throw new SecurityException("Vai trò " + nhanVien.getChucVu() + " không được thực hiện chức năng này.");
     }
 }

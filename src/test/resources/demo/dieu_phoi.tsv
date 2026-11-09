@@ -1,0 +1,26 @@
+# Dữ liệu chỉ dùng kiểm thử; ngày khám là số ngày lệch với hôm nay.
+# BN | mã | họ tên | ngày sinh | giới tính | SĐT | địa chỉ | tiền sử | dị ứng
+BN	BN2601010001	Nguyễn Minh Châu	1997-03-12	Nữ	0911110001	Quận 3, TP.HCM	Đã điều trị tủy răng 36	Penicillin
+BN	BN2601010002	Trần Quốc Bảo	1988-07-22	Nam	0911110002	Quận 10, TP.HCM	Chưa ghi nhận	Chưa ghi nhận
+BN	BN2601010003	Lê Ngọc Anh	2001-01-05	Nữ	0911110003	Bình Thạnh, TP.HCM	Đang chỉnh nha	Chưa ghi nhận
+BN	BN2601010004	Phạm Hoàng Nam	1992-11-16	Nam	0911110004	Thủ Đức, TP.HCM	Viêm nướu tái phát	Chưa ghi nhận
+BN	BN2601010005	Võ Thanh Hà	1978-09-09	Nữ	0911110005	Quận 5, TP.HCM	Tăng huyết áp	Chưa ghi nhận
+BN	BN2601010006	Đặng Gia Huy	2004-06-18	Nam	0911110006	Quận 7, TP.HCM	Chưa ghi nhận	Chưa ghi nhận
+BN	BN2601010007	Bùi Thảo Vy	1999-12-01	Nữ	0911110007	Tân Bình, TP.HCM	Chưa ghi nhận	Latex
+# PH | mã | tên phòng | mã bác sĩ | tên bác sĩ | đang nhận bệnh
+PH	P01	Phòng khám 01	NV2601010003	Nguyễn Văn An	true
+PH	P02	Phòng khám 02	NV2601010008	Bùi Đức Tâm	true
+PH	P03	Phòng khám 03	NV2601010005	Phạm Thu Hà	false
+# HC | mã phiếu | lệch ngày | phòng | STT | mã bệnh nhân | đã trả phí | trạng thái
+HC	PK2601019001	0	P01	1	BN2601010001	true	CHO_KHAM
+HC	PK2601019002	0	P01	2	BN2601010002	true	CHO_KHAM
+HC	PK2601019003	0	P01	3	BN2601010003	false	CHO_KHAM
+HC	PK2601019004	0	P01	4	BN2601010004	true	CHO_KHAM
+HC	PK2601019005	0	P02	1	BN2601010005	true	DANG_KHAM
+HC	PK2601019006	0	P02	2	BN2601010006	true	CHO_KHAM
+HC	PK2601019007	0	P03	1	BN2601010007	true	CHO_KHAM
+# LS | mã phiếu | lệch ngày | mã bệnh nhân | mã bác sĩ | tên bác sĩ | chẩn đoán | điều trị | ghi chú
+LS	PK2601019101	-30	BN2601010001	NV2601010003	Nguyễn Văn An	Sâu răng 36	Điều trị tủy	Đã hoàn tất; hẹn tái khám.
+LS	PK2601019102	-7	BN2601010001	NV2601010003	Nguyễn Văn An	Kiểm tra sau điều trị	Kiểm tra khớp cắn	Tiến triển ổn định.
+LS	PK2601019103	-15	BN2601010002	NV2601010008	Bùi Đức Tâm	Cao răng	Lấy cao răng	Hướng dẫn vệ sinh răng miệng.
+LS	PK2601019104	-10	BN2601010004	NV2601010003	Nguyễn Văn An	Viêm nướu	Vệ sinh nha chu	Hẹn tái khám sau điều trị.

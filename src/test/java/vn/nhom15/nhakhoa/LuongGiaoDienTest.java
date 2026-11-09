@@ -28,8 +28,7 @@ class LuongGiaoDienTest {
         var baoCaoBUS = new BaoCaoBUS(phongKhamDAO, quanLyPhien);
         AtomicReference<GD_Chinh> thamChieu = new AtomicReference<>();
         SwingUtilities.invokeAndWait(() -> {
-            GD_Chinh khungCuaSo = new GD_Chinh(dangNhapBUS, quanLyPhien, nhanSuBUS, danhMucBUS, baoCaoBUS,
-                    true);
+            GD_Chinh khungCuaSo = new GD_Chinh(dangNhapBUS, quanLyPhien, nhanSuBUS, danhMucBUS, baoCaoBUS);
             khungCuaSo.addNotify();
             khungCuaSo.validate();
             thamChieu.set(khungCuaSo);

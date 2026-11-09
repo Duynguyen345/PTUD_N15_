@@ -19,7 +19,8 @@ public final class DangNhapBUS {
 
     public PhienDangNhap dangNhap(String maTaiKhoan, char[] matKhau) {
         try {
-            if (maTaiKhoan == null || maTaiKhoan.isBlank() || matKhau.length == 0)
+            quanLyPhien.dangXuat();
+            if (maTaiKhoan == null || maTaiKhoan.isBlank() || matKhau == null || matKhau.length == 0)
                 throw new IllegalArgumentException("Nhập đầy đủ mã tài khoản và mật khẩu.");
             if (!maTaiKhoan.trim().matches("TK\\d{10}"))
                 throw new IllegalArgumentException(
@@ -39,7 +40,7 @@ public final class DangNhapBUS {
             quanLyPhien.batDauPhien(taiKhoan.getMaTaiKhoan(), phien);
             return phien;
         } finally {
-            Arrays.fill(matKhau, '\0');
+            if (matKhau != null) Arrays.fill(matKhau, '\0');
         }
     }
 
