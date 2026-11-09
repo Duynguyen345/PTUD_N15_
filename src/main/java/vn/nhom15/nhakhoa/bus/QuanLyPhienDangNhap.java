@@ -28,15 +28,20 @@ public final class QuanLyPhienDangNhap {
     }
 
     public void kiemTraQuyenQuanLy() {
+        kiemTraQuyen(ChucVu.QUAN_LY);
+    }
+
+    public PhienDangNhap kiemTraQuyen(ChucVu vaiTro) {
         PhienDangNhap phien = phienHienTai;
         String dangNhap = maTaiKhoan;
-        if (phien == null || phien.getChucVu() != ChucVu.QUAN_LY || dangNhap == null)
-            throw new SecurityException("Bạn không có quyền quản lý.");
+        if (phien == null || phien.getChucVu() != vaiTro || dangNhap == null)
+            throw new SecurityException("Bạn không có quyền thực hiện chức năng này.");
         TaiKhoan taiKhoan = phongKhamDAO.timTaiKhoan(dangNhap);
         NhanVien nhanVien = phongKhamDAO.danhSachNhanVien().stream()
                 .filter(n -> n.getMaNhanVien().equals(phien.getMaNhanVien())).findFirst().orElse(null);
         if (taiKhoan == null || taiKhoan.getTrangThai() != TrangThaiTaiKhoan.HOAT_DONG || nhanVien == null
-                || !nhanVien.isConLamViec() || nhanVien.getChucVu() != ChucVu.QUAN_LY)
+                || !nhanVien.isConLamViec() || nhanVien.getChucVu() != vaiTro)
             throw new SecurityException("Quyền truy cập đã thay đổi. Vui lòng đăng xuất.");
+        return phien;
     }
 }

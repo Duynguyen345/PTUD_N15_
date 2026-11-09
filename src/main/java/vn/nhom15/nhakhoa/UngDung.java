@@ -26,6 +26,10 @@ public final class UngDung {
         NhanSuBUS nhanSuBUS = new NhanSuBUS(phongKhamDAO, quanLyPhien, boBamMatKhau);
         DanhMucBUS danhMucBUS = new DanhMucBUS(phongKhamDAO, quanLyPhien);
         BaoCaoBUS baoCaoBUS = new BaoCaoBUS(phongKhamDAO, quanLyPhien);
+        LeTanDAO leTanDAO = duLieuMau ? new LeTanDuLieuMauDAO(phongKhamDAO)
+                : new LeTanDAO(
+                        new KetNoiCSDL(Path.of(System.getProperty("db.config", "db.properties"))));
+        LeTanBUS leTanBUS = new LeTanBUS(leTanDAO, phongKhamDAO, quanLyPhien);
         SwingUtilities.invokeLater(() -> {
             try {
                 for (UIManager.LookAndFeelInfo giaoDien : UIManager.getInstalledLookAndFeels())
@@ -37,7 +41,7 @@ public final class UngDung {
                 // Giao diện mặc định vẫn dùng được.
             }
             UIManager.put("defaultFont", new Font("Segoe UI", Font.PLAIN, 14));
-            new GD_Chinh(dangNhapBUS, quanLyPhien, nhanSuBUS, danhMucBUS, baoCaoBUS, duLieuMau)
+            new GD_Chinh(dangNhapBUS, quanLyPhien, nhanSuBUS, danhMucBUS, baoCaoBUS, leTanBUS, duLieuMau)
                     .setVisible(true);
         });
     }
