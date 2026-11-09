@@ -15,7 +15,7 @@ Phân công cập nhật ngày 08/11/2026: Duy phụ trách xác thực đăng n
 | Hàng hóa | Tên/đơn vị/tồn/ngưỡng, cảnh báo tồn <= ngưỡng |
 | Báo cáo | Khoảng ngày, hai biểu đồ/bảng, CSV UTF-8 BOM, xác nhận ghi đè |
 
-Đã tích hợp màn hàng chờ, phòng nhận bệnh và tra cứu của Thanh theo quyền từng vai trò. Luồng tiếp nhận/thu phí và hoàn tất khám của Huy/Thắng tiếp tục tích hợp. Hàng hóa chưa có sổ nhập/xuất hoặc AI. Báo cáo không có doanh thu. Quên mật khẩu chỉ hướng dẫn liên hệ quản trị viên.
+Vai trò Lễ tân/Bác sĩ/Phụ tá đăng nhập được nhưng chỉ thấy thông báo phạm vi; các màn nghiệp vụ của Huy/Thắng/Thanh không nằm trong lần triển khai này. Hàng hóa là QT-07 bổ sung của Duy, chưa có sổ nhập/xuất hoặc AI. Báo cáo không có doanh thu. Quên mật khẩu chỉ hướng dẫn liên hệ quản trị viên, chưa có luồng đặt lại tự động.
 
 ## Cách áp dụng OOP
 
@@ -24,13 +24,13 @@ Phân công cập nhật ngày 08/11/2026: Duy phụ trách xác thực đăng n
 ```text
 Swing panels → DangNhapBUS / NhanSuBUS / DanhMucBUS / BaoCaoBUS
              → PhongKhamDAO (lớp xử lý JDBC)
-                 └─ NguonKetNoi → KetNoiCSDL → SQL Server
-Swing panels → DieuPhoiBUS / TraCuuHoSoBUS → DieuPhoiJdbcDAO → SQL Server
+                 ├─ NguonKetNoi → KetNoiCSDL → SQL Server
+                 └─ PhongKhamDuLieuMauDAO kế thừa → dữ liệu trong bộ nhớ
 ```
 
 - Không có session/connection static; chỉ `main` là điểm vào static.
 - `QuanLyPhienDangNhap` quản lý phiên của một cửa sổ. BUS kiểm tra quyền quản lý và trạng thái tài khoản/nhân viên hiện hành trong kho dữ liệu.
-- `TaiKhoan` dùng thuộc tính `maTaiKhoan`. `HangHoa`, `DuLieuBaoCao` và các record điều phối/tra cứu là dữ liệu bất biến. DAO giả lập và TSV chỉ còn trong `src/test`, không thuộc luồng chạy ứng dụng.
+- Chỉ giữ entity cần cho phần Duy; `TaiKhoan` dùng thuộc tính `maTaiKhoan`. `HangHoa`, `DuLieuBaoCao` là record bất biến.
 - `ManHinhCoSo` chia sẻ phần trình bày và form; `BangDuLieu<T>` tái sử dụng bảng có tìm kiếm/sắp xếp; mỗi màn giữ trách nhiệm riêng.
 - GUI không gọi DAO hoặc viết SQL. GUI đọc form trên EDT, gọi service trong `SwingWorker`, cập nhật component lại trên EDT.
 - Kho dữ liệu chỉ xử lý lưu trữ. JDBC dùng PreparedStatement, try-with-resources, transaction và rollback.
@@ -48,7 +48,7 @@ Swing panels → DieuPhoiBUS / TraCuuHoSoBUS → DieuPhoiJdbcDAO → SQL Server
 
 ## Kịch bản nghiệm thu
 
-1. Cài database bằng `DATA/nhakhoa_sqlserver.sql`, cấu hình `db.properties`, chạy `run.ps1`, đăng nhập `TK2601010001 / 123456`. Dữ liệu lưu trực tiếp SQL Server.
+1. `run.ps1 -Demo`, đăng nhập `TK2601010001 / 123456`. Banner DEMO luôn hiện; dữ liệu không lưu khi đóng ứng dụng.
 2. Nhân viên: thử SĐT sai, dưới 18 tuổi; thêm hợp lệ, chọn dòng sửa; thử xóa nhân viên có tài khoản.
 3. Tài khoản: tạo cho nhân viên vừa thêm; thử tạo lần nữa cho nhân viên đã có tài khoản; khóa, đăng xuất và thử đăng nhập tài khoản đó.
 4. Đăng nhập `TK2601010002 / 123456`: không có menu quản lý. Các kiểm thử gọi trực tiếp BUS cũng phải bị từ chối.

@@ -2,7 +2,7 @@
 
 **Java 21 · Swing · JDBC · SQL Server.** Ứng dụng đọc/ghi trực tiếp SQL Server; không có chế độ demo trong bộ nhớ.
 
-Bộ SQL cho tất cả chức năng hiện có: [DATA/nhakhoa_sqlserver.sql](DATA/nhakhoa_sqlserver.sql). Danh mục phần Thanh: [BAI_THANH.md](BAI_THANH.md).
+Bộ SQL cần để cài và chạy các chức năng hiện có: [DATA/nhakhoa_sqlserver.sql](DATA/nhakhoa_sqlserver.sql).
 
 ## Cài đặt và chạy
 
@@ -26,7 +26,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\run.ps1
 
 Có thể nhấp đúp **chay_bai_thanh.cmd**, chạy `mvn compile exec:java`, hoặc chạy lớp `vn.nhom15.nhakhoa.UngDung` trong IDE có nạp dependency Maven. `run.ps1` dùng cache Maven tại `$env:USERPROFILE\.m2\repository` và tìm cả Maven trong bộ Java Extension của VS Code.
 
-Tài khoản quản lý: **TK2601010001 / 123456**. Xem [tài khoản và dữ liệu mẫu](TaiLieu/DU_LIEU_MAU.md). Tài khoản trên giao diện khác với tài khoản SQL trong `db.properties`.
+Tài khoản quản lý: **TK2601010001 / 123456**. Các mã **TK2601010002** (lễ tân), **TK2601010003** (bác sĩ), **TK2601010004** (phụ tá), **TK2601010005** (bác sĩ) cùng mật khẩu **123456**. **TK2601010006** bị khóa để thử từ chối đăng nhập. Tài khoản trên giao diện khác với tài khoản SQL trong `db.properties`.
 
 Mỗi bảng có 6 bản ghi mẫu; riêng `PhieuKham` có 12: 6 lượt hôm nay và 6 lượt cũ đã hoàn tất. Chạy lại SQL chỉ thêm mã còn thiếu, không xóa/ghi đè trạng thái hoặc đổi ngày dữ liệu cũ. Các thay đổi trên giao diện được lưu trong SQL Server và giữ lại sau khi đóng ứng dụng. Ngày khám mẫu chốt tại lần nạp đầu; sau khi qua ngày mới cần tiếp nhận lượt khám mới.
 
@@ -63,7 +63,7 @@ GUI không viết SQL hoặc gọi trực tiếp DAO. Tác vụ IO dùng SwingWo
 
 Tạo mã NV/TK/HH theo yyMMddNNNN, dịch vụ theo DVNNNN; bộ đếm `DuyBoDem` được khóa trong cùng transaction với INSERT. Các mã mẫu dùng ngày 01/01/2026; mã mới dùng ngày hiện tại. Mật khẩu tạo từ giao diện dùng PBKDF2; hash SHA-256 của tài khoản mẫu vẫn được hỗ trợ.
 
-DAO giả lập và TSV đã chuyển vào `src/test`, không nằm trong chương trình chính. Các schema/seed/generator cũ trong `DATA` chỉ phục vụ tài liệu/kiểm thử cũ; không cần chạy khi cài bộ SQL mới.
+DAO giả lập và TSV của bộ kiểm thử có sẵn nằm trong `src/test`, không thuộc chương trình chính. Chỉ cần chạy `DATA/nhakhoa_sqlserver.sql` khi cài database mới; không chạy thêm schema/seed/generator cũ.
 
 ## Kiểm thử
 
@@ -77,12 +77,4 @@ Nếu Maven trỏ sai cache:
 mvn "-Dmaven.repo.local=$env:USERPROFILE\.m2\repository" test
 ```
 
-Các test nghiệp vụ/Swing dùng dữ liệu cố định trong `src/test`. Test SQL được bỏ qua nếu chưa cung cấp database kiểm thử riêng.
-
-`SqlServerToanBaiTest` kiểm tra 10 bảng, tài khoản/quyền, tìm không dấu, báo cáo, gọi số đồng thời và trạng thái đã commit qua kết nối JDBC khác. Chuẩn bị database riêng tên bắt đầu bằng `N15_NHAKHOA_TEST_` từ bản sao file SQL (thay tên database), tạo cấu hình trỏ tới database đó rồi chạy:
-
-```powershell
-mvn test "-Dtest=SqlServerToanBaiTest" "-Dnhakhoa.jdbc.config=target/sqlserver-test.properties"
-```
-
-Test SQL mới không ghi vào database ứng dụng. Test `TichHopJdbcTest` cũ dùng bộ dữ liệu cũ và cấu hình `duy.jdbc.config` riêng.
+Các test nghiệp vụ/Swing có sẵn dùng dữ liệu cố định trong `src/test`. Test `TichHopJdbcTest` cũ dùng bộ dữ liệu cũ và cấu hình `duy.jdbc.config` riêng; được bỏ qua nếu chưa cung cấp cấu hình database kiểm thử.

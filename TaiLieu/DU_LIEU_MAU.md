@@ -1,43 +1,64 @@
-# Dữ liệu mẫu SQL Server cho toàn bộ chức năng hiện có
+# Bộ dữ liệu mẫu Duy — phiên bản đồng bộ
 
-Chạy duy nhất [DATA/nhakhoa_sqlserver.sql](../DATA/nhakhoa_sqlserver.sql) để tạo database **N15_NHAKHOA_DB**, các bảng/ràng buộc và dữ liệu. Script không xóa dữ liệu cũ; chạy lại chỉ bổ sung mã còn thiếu, không đặt lại trạng thái hay ngày khám.
+Đây là dữ liệu giả lập. Nguồn duy nhất: `src/main/resources/demo/dataset.tsv`.
+DEMO nạp trực tiếp file này; `java DATA/GenerateDemoSeed.java` sinh script SQL từ cùng nguồn.
 
-| Bảng | Số mẫu khi tạo mới | Công dụng |
-|---|---:|---|
-| NhanVien | 6 | Quản lý, lễ tân, bác sĩ, phụ tá |
-| TaiKhoan | 6 | Đăng nhập và kiểm tra tài khoản bị khóa |
-| DichVu | 6 | Danh mục và thống kê dịch vụ |
-| HangHoa | 6 | Tồn kho, cảnh báo cần bổ sung |
-| DuyBoDem | 6 | Bộ đếm NV, TK, DV, HH, BN, PK |
-| BenhNhan | 6 | Thông tin, tiền sử và dị ứng |
-| PhongKham | 6 | Bác sĩ phụ trách và trạng thái nhận bệnh |
-| PhieuKham | 12 | 6 lượt hôm nay và 6 lượt cũ đã hoàn tất |
-| HoSoKham | 6 | Chẩn đoán, điều trị, ghi chú của 6 lượt khám cũ |
-| ChiDinhDichVu | 6 | Dịch vụ được chỉ định trong các lượt khám cũ |
+## Số lượng
 
-Không phải mỗi lớp Java có một bảng riêng. `LuotChoKham` và `LichSuKham` là kết quả truy vấn các bảng trên; `DuLieuBaoCao` là dữ liệu tổng hợp. Vai trò/quyền/trạng thái là enum cố định, không cần 5–6 mẫu.
+| Dữ liệu | Số lượng |
+|---|---:|
+| Nhân viên | 10 |
+| Tài khoản | 6 |
+| Dịch vụ | 8 (6 phục vụ, 2 ngừng phục vụ) |
+| Hàng hóa | 8 (4 cần bổ sung) |
+| Phiếu khám | 14, mỗi ngày 2 phiếu trong 7 ngày gần nhất |
+| Chỉ định dịch vụ | 28 |
 
-## Tài khoản giao diện
+DEMO chốt ngày tham chiếu khi mở ứng dụng; SQL chốt ngày khi chạy seed. Muốn đối chiếu báo cáo, mở DEMO và chạy seed trong cùng ngày. Giá trị không tự tăng theo ngày khi ứng dụng đang mở.
 
-Mật khẩu: **123456**. Tài khoản kết nối SQL trong `db.properties` là tài khoản riêng, không dùng các mã TK này để đăng nhập SQL Server.
+## Tài khoản đăng nhập
 
-| Mã tài khoản | Họ tên | Vai trò | Trạng thái |
+Mật khẩu thử nghiệm: **123456**. Mã được cấp tuần tự từ bộ đếm với ngày mô phỏng 01/01/2026.
+
+| Mã tài khoản | Nhân viên | Vai trò | Kết quả đăng nhập |
 |---|---|---|---|
-| TK2601010001 | Lê Hoàng Minh | Quản lý | Hoạt động |
-| TK2601010002 | Nguyễn Thị Anh | Lễ tân | Hoạt động |
-| TK2601010003 | Nguyễn Văn An | Bác sĩ | Hoạt động |
-| TK2601010004 | Trần Minh Bình | Phụ tá | Hoạt động |
-| TK2601010005 | Phạm Thu Hà | Bác sĩ | Hoạt động |
-| TK2601010006 | Đặng Ngọc Mai | Lễ tân | Bị khóa |
+| TK2601010001 | Lê Hoàng Minh | Quản lý | Thành công, đủ menu quản lý |
+| TK2601010002 | Nguyễn Thị Anh | Lễ tân | Thành công, không có menu quản lý |
+| TK2601010003 | Nguyễn Văn An | Bác sĩ | Thành công, không có menu quản lý |
+| TK2601010004 | Trần Minh Bình | Phụ tá | Thành công, không có menu quản lý |
+| TK2601010005 | Phạm Thu Hà | Bác sĩ | Bị khóa |
+| TK2601010006 | Võ Quốc Huy | Lễ tân | Đã nghỉ việc, bị từ chối |
 
-## Tình huống thử
+Đặng Ngọc Mai, Bùi Đức Tâm, Lê Minh Bình đang làm việc và chưa có tài khoản: dùng để thử chức năng tạo tài khoản. Hoàng Gia Bảo đã nghỉ và chưa có tài khoản, không được chọn để tạo tài khoản.
 
-- Quản lý: xem tổng quan, nhân viên, tài khoản, 6 dịch vụ, 6 hàng hóa và báo cáo 7 ngày.
-- Phụ tá: P01 có số 001/002 đủ điều kiện gọi, số 003 chưa trả phí, số 004 vắng mặt. P02 có bệnh nhân đang khám; P03 tạm ngưng. P04/P05 trống, đang nhận bệnh; P06 trống, tạm ngưng.
-- Bác sĩ TK2601010003 phụ trách P01/P04/P05; TK2601010005 phụ trách P02/P03/P06. Không được bật/tắt phòng của bác sĩ khác.
-- Lễ tân/bác sĩ: tìm `nguyen minh chau`, `BN2601010001` hoặc `0911110001`; chọn phiếu cũ để xem chẩn đoán/điều trị. Cả 6 bệnh nhân đều có lịch sử hoàn tất.
-- Lưu dữ liệu: gọi số/đổi trạng thái phòng, đóng/mở lại ứng dụng rồi kiểm tra trạng thái còn nguyên trong SQL Server.
+## Tìm kiếm nhân viên
 
-Ngày mẫu là ngày Việt Nam khi nạp lần đầu. Hàng chờ chỉ hiển thị lượt của hôm nay; sau khi qua ngày mới cần tiếp nhận lượt khám mới trong SQL Server, không tự chuyển lượt cũ sang ngày mới.
+| Từ khóa | Kết quả ban đầu |
+|---|---|
+| Bình | Trần Minh Bình, Lê Minh Bình |
+| An | Nguyễn Văn An, Nguyễn Thị Anh (tìm chứa chuỗi) |
+| Nguyễn Văn An | 1 kết quả |
+| 0901234567 | Nguyễn Văn An |
+| 0987654321 | Trần Minh Bình |
+| 079000000003 | Nguyễn Văn An qua CCCD |
+| Đang làm | 0, không tìm trên trạng thái |
+| Phụ tá | 0, không tìm trên chức vụ |
 
-Các TSV trong `src/test/resources/demo` chỉ dành cho kiểm thử cũ, không được nạp khi chạy ứng dụng.
+Các bảng vẫn trống trước khi nhập từ khóa và bấm Tìm kiếm. Tìm không dấu chưa được hỗ trợ.
+
+## Hàng hóa và báo cáo
+
+Găng tay y tế (8/10), Gạc vô trùng (0/5), Vật liệu trám (5/5) và Dung dịch sát khuẩn (4/6) cần bổ sung. Bốn hàng còn lại trên ngưỡng.
+
+Báo cáo 7 ngày có 14 lượt khám và 28 chỉ định: Khám ban đầu 14, Lấy cao răng 5, Trám răng thẩm mỹ 3, Nhổ răng thường 2, Chụp X-quang răng 3, Tẩy trắng răng 1. Hôm nay có 2 lượt/4 chỉ định. Không tính doanh thu.
+
+DEMO tổng hợp từ phiếu mẫu và dùng tên dịch vụ hiện hành, giống SQL JOIN/GROUP BY; sửa tên danh mục sẽ đổi tên hiển thị trong báo cáo, không đổi số lần chỉ định.
+
+## Nạp lại từ đầu
+
+- DEMO: đóng ứng dụng và chạy `run.ps1 -Demo`. Dữ liệu nhập thêm trong phiên trước không được lưu.
+- SQL: chọn database demo `N15_DUY_DB` đã có schema hiện tại, chạy `DATA/seed/001_duy_demo.sql`. **Script này xóa dữ liệu cũ trong 7 bảng của Duy và nạp lại toàn bộ bộ mẫu**, trong một transaction. Chạy lại không cộng dồn bản ghi.
+- Script từ chối database khác ngoài `N15_DUY_DB` và `N15_DUY_TEST_*`. Không dùng trên database nghiệp vụ đầy đủ của nhóm; các ràng buộc ngoài phạm vi có thể khiến reset bị rollback.
+- Nếu sửa TSV: chạy lại `java DATA/GenerateDemoSeed.java`, sau đó build ứng dụng và nạp lại seed SQL để hai chế độ khớp nhau.
+
+Các class, giao diện và chức năng được giữ nguyên; chỉ thay dữ liệu mẫu và cách nạp/tổng hợp dữ liệu DEMO.
