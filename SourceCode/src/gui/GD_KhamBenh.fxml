@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.GD_KhamBenh_Controller" styleClass="bacsi-screen">
+ <top><VBox spacing="6" styleClass="header"><padding><Insets top="10" right="14" bottom="10" left="14"/></padding>
+  <HBox spacing="12" alignment="CENTER_LEFT"><Label text="Khám và điều trị" styleClass="page-title"/><Label fx:id="lb_trangThai"/></HBox>
+  <Label fx:id="lb_bn" text="Chọn phiếu khám được phân công" wrapText="true"/>
+ </VBox></top>
+ <center><SplitPane dividerPositions="0.22">
+  <VBox fx:id="pn_danhSach" spacing="8" minWidth="310" prefWidth="330" maxWidth="360" SplitPane.resizableWithParent="false"><padding><Insets top="10" right="8" bottom="10" left="8"/></padding>
+   <Label text="Phiếu của tôi"/><DatePicker fx:id="dp_ngay"/><Button text="Tải lại" onAction="#taiLai" maxWidth="Infinity"/>
+   <TableView fx:id="table_danhSach" minWidth="0" VBox.vgrow="ALWAYS"/>
+   <Label text="Bác sĩ khám sau khi phụ tá xác nhận vào khám." wrapText="true"/>
+  </VBox>
+  <BorderPane fx:id="pn_chiTiet" minWidth="0">
+   <center><TabPane tabClosingPolicy="UNAVAILABLE">
+    <Tab text="Khám và điều trị"><ScrollPane fitToWidth="true"><content><VBox spacing="10"><padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+     <TitledPane text="Tiền sử / dị ứng" expanded="false"><content><VBox spacing="6">
+      <HBox spacing="10">
+       <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Tiền sử bệnh"/><TextArea fx:id="ta_tienSu" prefRowCount="2" wrapText="true" promptText="Chưa khai thác"/></VBox>
+       <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Dị ứng"/><TextArea fx:id="ta_diUng" prefRowCount="2" wrapText="true" promptText="Chưa khai thác"/></VBox>
+      </HBox>
+      <Label text="Thuốc đang dùng (nếu có)"/><TextArea fx:id="ta_thuocDangDung" prefRowCount="1" wrapText="true"/>
+     </VBox></content></TitledPane>
+     <FlowPane hgap="8" vgap="6">
+      <Button text="Thêm dòng khám" onAction="#themGhiNhan"/><Button text="Sửa dòng" onAction="#suaGhiNhan"/><Button text="Bỏ dòng" onAction="#xoaGhiNhan"/>
+     </FlowPane>
+     <TableView fx:id="table_ghiNhan" prefHeight="330"/>
+     <Label fx:id="lb_tongDichVu" wrapText="true"/>
+     <TitledPane text="Ghi chú khám chung (nếu cần)" expanded="false"><content><VBox spacing="6">
+      <Label text="Triệu chứng"/><TextArea fx:id="ta_trieuChung" prefRowCount="2" wrapText="true"/>
+      <Label text="Nhận định chung"/><TextArea fx:id="ta_chanDoan" prefRowCount="2" wrapText="true"/>
+     </VBox></content></TitledPane>
+     <Label text="Dặn dò"/><TextArea fx:id="ta_danDo" prefRowCount="2" wrapText="true"/>
+     <HBox spacing="10"><Label text="Ngày hẹn buổi tiếp theo (nếu cần)"/><DatePicker fx:id="dp_hen"/></HBox>
+     <Label text="Hẹn từng buổi; cập nhật ngày hẹn tiếp theo ở lượt khám sau." wrapText="true"/>
+    </VBox></content></ScrollPane></Tab>
+    <Tab text="Phác đồ / kế hoạch"><fx:include fx:id="keHoach" source="GD_KeHoachDieuTri.fxml"/></Tab>
+    <Tab text="Đơn thuốc"><BorderPane>
+     <top><VBox spacing="6"><padding><Insets top="10" right="12" bottom="6" left="12"/></padding>
+      <Label fx:id="lb_diUng" wrapText="true"/>
+     </VBox></top>
+     <center><ScrollPane fitToWidth="true" fitToHeight="true"><content><SplitPane fx:id="split_donThuoc" dividerPositions="0.52">
+      <ScrollPane fitToWidth="true" minWidth="0"><content><VBox fx:id="pn_keThuoc" minWidth="300"/></content></ScrollPane>
+      <VBox spacing="8" minWidth="0"><padding><Insets top="8" right="10" bottom="8" left="8"/></padding>
+       <Label text="Thuốc trong toa"/><TableView fx:id="table_thuoc" VBox.vgrow="ALWAYS"/>
+       <HBox spacing="8"><Button text="Sửa thuốc" onAction="#suaThuoc"/><Button text="Bỏ thuốc" onAction="#xoaThuoc"/></HBox>
+       <TitledPane text="Ghi chú thuốc tự mua" expanded="false"><content><TextArea fx:id="ta_thuocTuMua" prefRowCount="2" wrapText="true"/></content></TitledPane>
+      </VBox>
+     </SplitPane></content></ScrollPane></center>
+    </BorderPane></Tab>
+    <Tab text="Hồ sơ bệnh án"><VBox spacing="8"><padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+     <TableView fx:id="table_lichSu" prefHeight="220"/>
+     <HBox spacing="8"><Button text="Trang trước" onAction="#lichSuTruoc"/><Button text="Trang tiếp" onAction="#lichSuSau"/></HBox>
+     <TextArea fx:id="ta_lichSu" editable="false" wrapText="true" VBox.vgrow="ALWAYS"/>
+    </VBox></Tab>
+   </TabPane></center>
+   <bottom><HBox spacing="12" alignment="CENTER_RIGHT" styleClass="card"><padding><Insets top="10" right="16" bottom="10" left="16"/></padding>
+    <Label fx:id="lb_daLuu"/>
+    <Button fx:id="btn_luu" text="Lưu" onAction="#luu"/>
+    <Button fx:id="btn_hoanTat" text="Hoàn tất lượt khám" styleClass="btn-success" onAction="#hoanTat"/>
+   </HBox></bottom>
+  </BorderPane>
+ </SplitPane></center>
+</BorderPane>
